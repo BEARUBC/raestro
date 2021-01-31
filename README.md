@@ -7,7 +7,7 @@ In order to configure UART for the Raspberry Pi, do the following:
 1. Remove "console=serial0,11520" from /boot/cmdline.txt
 2. Disable the Bluetooth by:
 	* Adding "dtoverlay=pi3-disable-bt" to /boot/config.txt (without the quotation marks)
-	* Run the command "sudo systemctl disable hciuart"
+	* Running the command "sudo systemctl disable hciuart"
 
 ### Trouble-shooting
 If "cargo build" or "cargo test" do not work because of the rppal dependency, check the rppal documentations on how to set up UART.
