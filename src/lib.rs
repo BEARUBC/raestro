@@ -8,6 +8,7 @@ use std::time::Duration;
 use rppal::uart::{
     Parity,
     Uart,
+    Result,
 };
 use rppal::system::DeviceInfo;
 
@@ -24,7 +25,7 @@ mod tests {
     #[test]
     fn lights() -> () {
         // println!("Blinking an LED on a {}.", super::DeviceInfo::new().unwrap().model());
-        let uart = super::Uart::new(115_200, super::Parity::None, 8, 1);
+        let uart: super::Result<super::Uart> = super::Uart::new(115_200, super::Parity::None, 8u8, 1u8);
         
         match uart {
             Ok(_) => println!("uart init work"),
