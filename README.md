@@ -11,6 +11,6 @@ In order to configure UART for the Raspberry Pi, do the following:
 
 ### Trouble-shooting
 If "cargo build" or "cargo test" do not work because of the rppal dependency, check the rppal documentations on how to set up UART.
-The link is [here][1]
+The link is [here][1].
 
 [1]: https://docs.rs/rppal/0.11.3/rppal/uart/index.html
