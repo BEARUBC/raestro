@@ -27,7 +27,12 @@ mod tests {
     #[test]
     fn lights() -> () {
         // println!("Blinking an LED on a {}.", super::DeviceInfo::new().unwrap().model());
-        let uart: Uart = Uart::new(115_200, Parity::None, 8u8, 1u8).unwrap();
+        let mut uart: Uart = Uart::new(115_200, Parity::None, 8u8, 1u8).unwrap();
+        // uart.set_baud_rate(115_200u32);
+        uart.set_baud_rate(50u32);
+        loop {
+            uart.send_start();
+        }
 
         // Blink the LED by setting the pin's logic level high for 500 ms.
         // uart.set_high();
