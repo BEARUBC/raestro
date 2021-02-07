@@ -1,11 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use std::error::Error;
-use std::thread;
-use std::time::Duration;
-
 mod gpio;
+mod maestro;
+mod uart_metadata;
 
 // Gpio uses BCM pin numbering. BCM GPIO 23 is tied to physical pin 16.
 // const GPIO_UART_TX: u8 = 14u8;
@@ -16,46 +14,30 @@ mod gpio;
 
 #[cfg(test)]
 mod tests {
-    use rppal::{
-        uart::{
-            Parity,
-            Uart,
-            Result,
-        },
-        system::DeviceInfo,
+    use crate::maestro::Maestro;
+    use crate::uart_metadata::{
+        BaudRate,
+        Channel,
     };
-    use super::gpio::{
-        UartMetaData,
-        BUFFER,
-    };
- 
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+    use std::error::Error;
+    use std::thread;
+    use std::time::Duration;
 
     #[test]
-    fn lights() -> () {
-        // println!("Blinking an LED on a {}.", super::DeviceInfo::new().unwrap().model());
-        let mut uart: Uart = Uart::new(
-            UartMetaData::BAUDRATE as u32,
-            Parity::None,
-            UartMetaData::DATABITS as u8,
-            UartMetaData::STOPBITS as u8
-        )
-            .unwrap();
+    fn maestro_initialization() -> () {
+        let mut maestro: Maestro = Maestro::new();
+        maestro.initialize(BaudRate::BR_115200);
 
-        uart.send_start();
+        let small: u16 = 500u16;
+        let big: u16 = 2500u16;
+        let sleep_time: u64 = 1000u64;
 
         loop {
-            uart.write(&BUFFER);
+            maestro.set_target(Channel::C_0, small);
+            thread::sleep(Duration::from_millis(sleep_time));
+
+            maestro.set_target(Channel::C_0, big);
+            thread::sleep(Duration::from_millis(sleep_time));
         }
-
-        // Blink the LED by setting the pin's logic level high for 500 ms.
-        // uart.set_high();
-        // thread::sleep(Duration::from_millis(500));
-        // uart.set_low();
-
-        // Ok(())
     }
 }
