@@ -1,5 +1,5 @@
 [package]
-name = "PololuRust"
+name = "rustro"
 version = "0.1.0"
 authors = ["nathan-n-poon <nathannpoon@gmail.com>"]
 edition = "2018"
