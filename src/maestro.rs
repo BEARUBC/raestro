@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+// External Uses
 use std::boxed::Box;
 use rppal::{
     uart::{
@@ -11,15 +12,17 @@ use rppal::{
     system::DeviceInfo,
 };
 
-use crate::gpio::{
-    UartMetaData,
+// Internal Uses
+use crate::utils::{
+    mask_byte,
+    microsec_to_target,
 };
-use crate::uart_metadata::{
-    BaudRate,
-    Channel,
+use crate::maestro_constants::{
+    ProtocolMetaData,
+    Commands,
+    Channels,
+    BaudRates,
 };
-
-// pub(crate) const BUFFER: [u8; 6usize] = [0xaau8, 0x0cu8, 0x04u8, 0x00u8, 0x70u8, 0x2eu8];
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
@@ -32,16 +35,16 @@ impl Maestro {
         };
     }
 
-    pub fn initialize(self: &mut Self, baud_rate: BaudRate) -> std::result::Result<(), Error> {
+    pub fn initialize(self: &mut Self, baud_rate: BaudRates) -> std::result::Result<(), Error> {
+        let data_bits: u8 = 8u8;
+        let stop_bits: u8 = 1u8;
+
         let uart_result: Result<Uart> = Uart::new(
             baud_rate as u32,
             Parity::None,
-            8u8,
-            1u8
+            data_bits,
+            stop_bits
         );
-
-        let buffer: [u8; 1usize] = [0xaau8];
-        self.write(&buffer);
 
         return match uart_result {
             Ok(uart) => {
@@ -51,24 +54,12 @@ impl Maestro {
             Err(err_msg) => Err(err_msg)
         };
     }
+
     pub fn close(self: &mut Self) -> () {
         match &self.uart {
             Some(boxed_uart) => self.uart = None,
             None => (),
         };
-    }
-
-    fn microsec_to_target(mut microsec: u16) -> (u8, u8) {
-        let multiplier: u8 = 2u8;
-        let mask: u16 = 0x7fu16;
-        let down_shift: u8 = 7u8;
-
-        microsec <<= multiplier;
-
-        let lower: u8 = (microsec & mask) as u8;
-        let upper: u8 = ((microsec >> down_shift) & mask) as u8;
-
-        return (lower, upper);
     }
 
     fn write(self: &mut Self, buffer: &[u8]) -> std::result::Result<usize, Error> {
@@ -85,11 +76,19 @@ impl Maestro {
         }
     }
 
-    pub fn set_target(self: &mut Self, channel: Channel, microsec: u16) -> std::result::Result<usize, Error> {
-        // let command: u8 = 0x84u8;
-        let (lower, upper): (u8, u8) = Maestro::microsec_to_target(microsec);
+    pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
+        let command: u8 = mask_byte(Commands::SET_TARGET as u8);
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
 
-        let buffer: [u8; 6usize] = [0xaau8, 0x0cu8, 0x04u8, channel as u8, lower, upper];
+        let buffer: [u8; 6usize] = [
+            ProtocolMetaData::SYNC as u8,
+            ProtocolMetaData::DEVICE_NUMBER as u8,
+            command,
+            channel as u8,
+            lower,
+            upper
+        ];
+
         return self.write(&buffer);
     }
 
