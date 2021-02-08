@@ -1,5 +1,5 @@
 # A Rust-flavoured 6-Channel Pololu Micro Maestro API Interface
-Written and developed by UBC Bionics, Ltd., a design team based in University of British Columbia, Vancouver.
+Written and developed by UBC Bionics, Ltd., a design team based in the University of British Columbia, Vancouver.
 
 ## Getting Started
 The Rust crate "rppal" provides user-level APIs for protocols such as PWM, I2C, and UART.
