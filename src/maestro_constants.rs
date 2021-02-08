@@ -1,7 +1,7 @@
 #![allow(non_camel_case_types)]
 
 #[repr(u8)]
-pub enum ProtocolMetaData {
+pub(crate) enum ProtocolMetaData {
     SYNC = 0xaau8,
     DEVICE_NUMBER = 0x0cu8,
 }
@@ -9,6 +9,8 @@ pub enum ProtocolMetaData {
 #[repr(u8)]
 pub(crate) enum Commands {
     SET_TARGET = 0x84u8,
+    SET_SPEED = 0x87u8,
+    SET_ACCELERATION = 0x89u8,
 }
 
 #[repr(u8)]
