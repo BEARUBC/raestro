@@ -19,7 +19,7 @@ use crate::uart_metadata::{
     Channel,
 };
 
-pub(crate) const BUFFER: [u8; 4usize] = [0x84u8, 0x00u8, 0x70u8, 0x2eu8];
+// pub(crate) const BUFFER: [u8; 6usize] = [0xaau8, 0x0cu8, 0x04u8, 0x00u8, 0x70u8, 0x2eu8];
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
@@ -73,8 +73,8 @@ impl Maestro {
 
     fn write(self: &mut Self, buffer: &[u8]) -> std::result::Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            // let result: Result<usize> = (*boxed_uart).write(buffer);
-            let result: Result<usize> = (*boxed_uart).write(&BUFFER);
+            let result: Result<usize> = (*boxed_uart).write(buffer);
+            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
 
             return match result {
                 Ok(bits_read) => Ok(bits_read),
@@ -86,10 +86,10 @@ impl Maestro {
     }
 
     pub fn set_target(self: &mut Self, channel: Channel, microsec: u16) -> std::result::Result<usize, Error> {
-        let command: u8 = 0x84u8;
+        // let command: u8 = 0x84u8;
         let (lower, upper): (u8, u8) = Maestro::microsec_to_target(microsec);
 
-        let buffer: [u8; 4usize] = [command, channel as u8, lower, upper];
+        let buffer: [u8; 6usize] = [0xaau8, 0x0cu8, 0x04u8, channel as u8, lower, upper];
         return self.write(&buffer);
     }
 

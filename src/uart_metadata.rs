@@ -15,3 +15,9 @@ pub enum Channel {
     C_4 = 0x4u8,
     C_5 = 0x5u8,
 }
+
+// #[repr(u8)]
+// pub enum PololuProtocol {
+//     NOTICE = 0xaau8,
+    
+// }

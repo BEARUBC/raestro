@@ -29,7 +29,7 @@ mod tests {
         maestro.initialize(BaudRate::BR_115200);
 
         let small: u16 = 500u16;
-        let big: u16 = 2500u16;
+        let big: u16 = 60000u16;
         let sleep_time: u64 = 1000u64;
 
         loop {
