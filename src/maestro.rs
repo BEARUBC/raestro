@@ -82,8 +82,18 @@ impl Maestro {
         }
     }
 
-    fn read(self: &Self) -> Result<usize> {
-        todo!();
+    fn read(self: &Self) -> std::result::Result<usize, Error> {
+        if let Some(boxed_uart) = &mut self.uart {
+            let result: Result<usize> = (*boxed_uart).read(buffer);
+            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
+
+            return match result {
+                Ok(bits_read) => Ok(result),
+                Err(err_msg) => Err(err_msg),
+            };
+        } else {
+            return Ok(0usize);
+        }
     }
 }
 
@@ -134,5 +144,20 @@ impl MaestroCommands for Maestro {
         ];
 
         return self.write(&buffer);
+    }
+
+    fn get_position(self: &mut Self, channel: Channels) -> std::result::Result<usize, Error> {
+        let command: u8 = mask_byte(Commands::GET_POSITION as u8);
+        
+        let buffer: [u8; 2usize] = [
+            ProtocolMetaData::SYNC as u8,
+            ProtocolMetaData::DEVICE_NUMBER as u8,
+            command,
+            channel as u8
+        ];
+
+        self.write(&buffer).unwrap(); 
+
+        return self.read();
     }
 }
