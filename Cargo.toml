@@ -1,8 +1,12 @@
 [package]
 name = "rustro"
 version = "0.1.0"
-authors = ["nathan-n-poon <nathannpoon@gmail.com>"]
+authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.com>", "KelvinKCLee <leekachunkelvin@gmail.com>", "bzhou64 <billzhou64@gmail.com>", "panchalmaharshi8 <panchalmaharshi8@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "A rust-flavoured library providing APIs to interface with the 6-Channel Pololu Micro Maestro"
+repository = "https://github.com/nathan-n-poon/PololuRust"
+keywords = ["Pololu", "Maestro", "6-channel", "servo"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
