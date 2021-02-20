@@ -1,8 +1,8 @@
 use std::thread;
 use std::time::Duration;
 
-use rustro::maestro::*;
-use rustro::maestro_constants::*;
+use raestro::maestro::*;
+use raestro::maestro_constants::*;
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
