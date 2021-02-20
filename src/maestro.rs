@@ -28,6 +28,7 @@ pub trait MaestroCommands {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error>;
     fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error>;
     fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> std::result::Result<usize, Error>;
+    fn get_position(self: &mut Self, channel: Channels) -> std::result::Result<usize, Error>;
 }
 
 pub struct Maestro {
@@ -82,13 +83,14 @@ impl Maestro {
         }
     }
 
-    fn read(self: &Self) -> std::result::Result<usize, Error> {
+    fn read(self: &mut Self) -> std::result::Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            let result: Result<usize> = (*boxed_uart).read(buffer);
+            let mut buffer: [u8;2] = [0,0];
+            let result: Result<usize> = (*boxed_uart).read(&mut buffer);
             // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
 
             return match result {
-                Ok(bits_read) => Ok(result),
+                Ok(bits_read) => Ok(result.unwrap()),
                 Err(err_msg) => Err(err_msg),
             };
         } else {
@@ -149,7 +151,7 @@ impl MaestroCommands for Maestro {
     fn get_position(self: &mut Self, channel: Channels) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::GET_POSITION as u8);
         
-        let buffer: [u8; 2usize] = [
+        let buffer: [u8; 4usize] = [
             ProtocolMetaData::SYNC as u8,
             ProtocolMetaData::DEVICE_NUMBER as u8,
             command,
