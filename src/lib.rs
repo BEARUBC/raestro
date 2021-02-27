@@ -13,21 +13,21 @@ mod utils;
 #[cfg(test)]
 mod tests {
     // External Uses
-    use std::error::Error;
-    use std::thread;
-    use std::time::Duration;
 
     // Internal Uses
     use crate::maestro::Maestro;
-    use crate::maestro_constants::{
-        Channels,
-        BaudRates,
-    };
+    use crate::maestro_constants::BaudRates;
 
     #[test]
     fn init_and_close() -> () {
         let mut maestro: Maestro = Maestro::new();
-        maestro.start(BaudRates::BR_115200);
+        let result = maestro.start(BaudRates::BR_115200);
+
+        match result {
+            Ok(_) => (),
+            Err(_) => panic!(),
+        };
+
         maestro.close();
     }
 }

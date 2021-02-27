@@ -12,7 +12,7 @@
 // }
 
 #[inline]
-pub(crate) fn mask_byte(mut byte: u8) -> u8 {
+pub(crate) fn mask_byte(byte: u8) -> u8 {
     let top_mask: u8 = 0x7fu8;
     return byte & top_mask;
 }
@@ -31,6 +31,8 @@ pub(crate) fn microsec_to_target(mut microsec: u16) -> (u8, u8) {
 
 #[cfg(test)]
 mod util_tests {
+    use super::*;
+
     #[test]
     fn simple_mask_byte_test() -> () {
         let byte: u8 = 0x00u8;
@@ -55,12 +57,7 @@ mod util_tests {
         assert_eq!(mask_byte(byte), expected_byte);
     }
 
-    /*
-        0x70        0x2e
-        0111_0000   00101110
-        xx01_0111_0111_0000
-    */
-
+    #[test]
     fn simple_short_to_target_test() -> () {
         let short: u16 = 1500u16;
         let expected: (u8, u8) = (0x70u8, 0x2eu8);

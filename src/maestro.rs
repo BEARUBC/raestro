@@ -9,7 +9,6 @@ use rppal::{
         Result,
         Error,
     },
-    system::DeviceInfo,
 };
 
 /* internal mods */
@@ -52,7 +51,7 @@ impl Maestro {
 
     pub fn close(self: &mut Self) -> () {
         match &self.uart {
-            Some(boxed_uart) => self.uart = None,
+            Some(_) => self.uart = None,
             None => (),
         };
     }
@@ -71,6 +70,7 @@ impl Maestro {
         }
     }
 
+    #[allow(unused)]
     fn read(self: &Self) -> Result<usize> {
         todo!();
     }
