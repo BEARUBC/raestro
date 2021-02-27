@@ -21,6 +21,11 @@ pub(crate) enum Commands {
     SET_ACCELERATION = 0x89u8,
     GET_POSITION = 0x90u8,
     GET_ERRORS = 0xA1u8,
+    GO_HOME = 0xA2u8,
+    STOP_SCRIPT = 0xA4u8,
+    RESTART_SCRIPT_AT_SUBROUTINE = 0xA7u8,
+    RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER = 0xA8u8,
+    GET_SCRIPT_STATUS = 0xAEu8,
 }
 
 #[allow(non_camel_case_types)]
