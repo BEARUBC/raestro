@@ -2,6 +2,7 @@ use std::thread;
 use std::time::Duration;
 
 use raestro::maestro::*;
+use raestro::maestro_commands::MaestroCommands;
 use raestro::maestro_constants::*;
 
 fn main() -> () {

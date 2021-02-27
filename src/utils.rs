@@ -14,7 +14,7 @@
 #[inline]
 pub(crate) fn mask_byte(mut byte: u8) -> u8 {
     let top_mask: u8 = 0x7fu8;
-    return byte && top_mask;
+    return byte & top_mask;
 }
 
 pub(crate) fn microsec_to_target(mut microsec: u16) -> (u8, u8) {
