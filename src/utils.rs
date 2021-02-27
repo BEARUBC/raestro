@@ -6,11 +6,6 @@
 
 /* internal uses */
 
-// #[inline]
-// pub(crate) fn mask_byte(mut byte: u8) -> u8 {
-//     return (byte && 0x7u8);
-// }
-
 #[inline]
 pub(crate) fn mask_byte(byte: u8) -> u8 {
     let top_mask: u8 = 0x7fu8;

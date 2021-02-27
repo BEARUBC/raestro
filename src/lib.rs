@@ -11,10 +11,14 @@ mod utils;
 /* internal uses */
 
 #[cfg(test)]
-mod tests {
-    // External Uses
+mod lib_tests {
+    /* external crates */
 
-    // Internal Uses
+    /* external uses */
+
+    /* internal mods */
+
+    /* internal uses */
     use crate::maestro::Maestro;
     use crate::maestro_constants::BaudRates;
 
