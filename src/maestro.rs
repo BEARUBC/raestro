@@ -74,6 +74,20 @@ impl Maestro {
     fn read(self: &Self) -> Result<usize> {
         todo!();
     }
+
+    #[inline]
+    fn prepare_write(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> std::result::Result<usize, Error> {
+        let buffer: [u8; 6usize] = [
+            ProtocolMetaData::SYNC as u8,
+            ProtocolMetaData::DEVICE_NUMBER as u8,
+            command,
+            channel as u8,
+            payload_0,
+            payload_1,
+        ];
+
+        return self.write(&buffer);
+    }
 }
 
 impl MaestroCommands for Maestro {
@@ -81,47 +95,42 @@ impl MaestroCommands for Maestro {
         let command: u8 = mask_byte(Commands::SET_TARGET as u8);
         let (lower, upper): (u8, u8) = microsec_to_target(microsec);
 
-        let buffer: [u8; 6usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
-            command,
-            channel as u8,
-            lower,
-            upper
-        ];
-
-        return self.write(&buffer);
+        return self.prepare_write(command, channel, lower, upper);
     }
 
     fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::SET_SPEED as u8);
         let (lower, upper): (u8, u8) = microsec_to_target(microsec);
 
-        let buffer: [u8; 6usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
-            command,
-            channel as u8,
-            lower,
-            upper
-        ];
+        return self.prepare_write(command, channel, lower, upper);
 
-        return self.write(&buffer);
+        // let buffer: [u8; 6usize] = [
+        //     ProtocolMetaData::SYNC as u8,
+        //     ProtocolMetaData::DEVICE_NUMBER as u8,
+        //     command,
+        //     channel as u8,
+        //     lower,
+        //     upper
+        // ];
+
+        // return self.write(&buffer);
     }
 
     fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::SET_ACCELERATION as u8);
         let (lower, upper): (u8, u8) = microsec_to_target(value as u16);
 
-        let buffer: [u8; 6usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
-            command,
-            channel as u8,
-            lower,
-            upper
-        ];
+        return self.prepare_write(command, channel, lower, upper);
 
-        return self.write(&buffer);
+        // let buffer: [u8; 6usize] = [
+        //     ProtocolMetaData::SYNC as u8,
+        //     ProtocolMetaData::DEVICE_NUMBER as u8,
+        //     command,
+        //     channel as u8,
+        //     lower,
+        //     upper
+        // ];
+
+        // return self.write(&buffer);
     }
 }
