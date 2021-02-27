@@ -18,8 +18,6 @@ pub(crate) enum Commands {
     RESTART_SCRIPT_AT_SUBROUTINE = 0xA7u8,
     RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER = 0xA8u8,
     GET_SCRIPT_STATUS = 0xAEu8,
-
-
 }
 
 #[repr(u8)]
