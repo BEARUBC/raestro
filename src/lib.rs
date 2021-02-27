@@ -33,19 +33,4 @@ mod lib_tests {
         maestro.start(BaudRates::BR_115200).unwrap();
         maestro.close();
     }
-
-    #[test]
-    fn mask_byte_test_0() -> () {
-        assert_eq!(mask_byte(5),5); 
-    }
-
-    #[test]
-    fn mask_byte_test_1() -> () {
-        assert_eq!(mask_byte(255),127)
-    }
-
-    #[test]
-    fn short_to_target_test_0() -> () {
-        assert_eq!(short_to_target(0), (0,0));
-    }
 }
