@@ -15,16 +15,9 @@ use rppal::{
 /* internal mods */
 
 /* internal uses */
-use crate::utils::{
-    mask_byte,
-    short_to_target,
-};
-use crate::maestro_constants::{
-    ProtocolMetaData,
-    Commands,
-    Channels,
-    BaudRates,
-};
+use crate::utils::*;
+use crate::maestro_constants::*;
+use crate::functions::Functions;
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
@@ -53,7 +46,7 @@ impl Maestro {
                 self.uart = Some(Box::new(uart));
                 Ok(())
             },
-            Err(err_msg) => Err(err_msg)
+            Err(err_msg) => Err(err_msg),
         };
     }
 
@@ -86,7 +79,7 @@ impl Maestro {
 impl MaestroCommands for Maestro {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::SET_TARGET as u8);
-        let (lower, upper): (u8, u8) = short_to_target(microsec);
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
 
         let buffer: [u8; 6usize] = [
             ProtocolMetaData::SYNC as u8,
@@ -102,7 +95,7 @@ impl MaestroCommands for Maestro {
 
     fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::SET_SPEED as u8);
-        let (lower, upper): (u8, u8) = short_to_target(microsec);
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
 
         let buffer: [u8; 6usize] = [
             ProtocolMetaData::SYNC as u8,
@@ -118,7 +111,7 @@ impl MaestroCommands for Maestro {
 
     fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> std::result::Result<usize, Error> {
         let command: u8 = mask_byte(Commands::SET_ACCELERATION as u8);
-        let (lower, upper): (u8, u8) = short_to_target(value as u16);
+        let (lower, upper): (u8, u8) = microsec_to_target(value as u16);
 
         let buffer: [u8; 6usize] = [
             ProtocolMetaData::SYNC as u8,
