@@ -21,13 +21,7 @@ mod tests {
     #[test]
     fn init_and_close() -> () {
         let mut maestro: Maestro = Maestro::new();
-        let result = maestro.start(BaudRates::BR_115200);
-
-        match result {
-            Ok(_) => (),
-            Err(_) => panic!(),
-        };
-
+        maestro.start(BaudRates::BR_115200).unwrap();
         maestro.close();
     }
 }
