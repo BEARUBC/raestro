@@ -3,7 +3,7 @@
 /* external uses */
 
 /* internal mods */
-pub mod functions;
+pub mod maestro_commands;
 pub mod maestro;
 pub mod maestro_constants;
 mod utils;

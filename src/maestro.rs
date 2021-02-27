@@ -17,7 +17,7 @@ use rppal::{
 /* internal uses */
 use crate::utils::*;
 use crate::maestro_constants::*;
-use crate::functions::Functions;
+use crate::maestro_commands::MaestroCommands;
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
