@@ -22,6 +22,11 @@ mod lib_tests {
     use crate::maestro::Maestro;
     use crate::maestro_constants::BaudRates;
 
+    use crate::utils::{
+        mask_byte,
+        short_to_target,
+    };
+
     #[test]
     fn init_and_close() -> () {
         let mut maestro: Maestro = Maestro::new();
