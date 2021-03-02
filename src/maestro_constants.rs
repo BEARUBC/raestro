@@ -13,7 +13,7 @@ pub(crate) enum ProtocolMetaData {
     DEVICE_NUMBER = 0x0cu8,
 }
 
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, unused)]
 #[repr(u8)]
 pub(crate) enum Commands {
     SET_TARGET = 0x84u8,
