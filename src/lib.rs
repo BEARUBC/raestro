@@ -10,7 +10,7 @@ mod utils;
 
 /* internal uses */
 
-#[cfg(test)]
+//#[cfg(test)]
 mod lib_tests {
     /* external crates */
 
