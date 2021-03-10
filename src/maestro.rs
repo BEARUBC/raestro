@@ -26,12 +26,6 @@ use crate::utils::*;
 use crate::maestro_constants::*;
 use crate::maestro_commands::MaestroCommands;
 
-// const W_BUFFER_3: Arc<Mutex<[u8; 6usize]>> = Arc::new(Mutex::new([0u8; 6usize]));
-// const W_BUFFER_4: [u8; 6usize] = [0u8] * 6usize;
-// const W_BUFFER_6: [u8; 6usize] = [0u8] * 6usize;
-
-// const R_BUFFER: [U8, 256usize] = [0u8] * 256usize;
-
 pub struct Maestro {
     uart: Option<Box<Uart>>,
 }
@@ -73,39 +67,34 @@ impl Maestro {
     #[allow(unused)]
     fn write(self: &mut Self, buffer: &[u8]) -> Result<usize, RppalError> {
         if let Some(boxed_uart) = &mut self.uart {
-            let result: RppalResult<usize> = (*boxed_uart).write(buffer);
-            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
-
-            return match result {
-                Ok(bits_read) => Ok(bits_read),
-                Err(err_msg) => Err(err_msg),
-            };
+            // let result: RppalResult<usize> = (*boxed_uart).write(buffer);
+            // return match result {
+            //     Ok(bits_read) => Ok(bits_read),
+            //     Err(err_msg) => Err(err_msg),
+            // };
+            todo!();
         } else {
-            // return Ok(0usize);
-            // return Error::SER_SIGNAL_ERR;
             todo!();
         }
     }
 
     #[allow(unused)]
-    fn read(self: &mut Self) -> Result<usize, RppalError> {
+    fn read(self: &mut Self, buffer: &mut [u8]) -> Result<usize, RppalError> {
         if let Some(boxed_uart) = &mut self.uart {
-            let mut buffer: [u8;2] = [0,0];
-            let result: RppalResult<usize> = (*boxed_uart).read(&mut buffer);
-            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
-
-            return match result {
-                Ok(bits_read) => Ok(result.unwrap()),
-                Err(err_msg) => Err(err_msg),
-            };
+            // let result: RppalResult<usize> = (*boxed_uart).read(buffer);
+            // return match result {
+            //     Ok(bits_read) => Ok(bits_read),
+            //     Err(err_msg) => Err(err_msg),
+            // };
+            todo!();
         } else {
-            return Ok(0usize);
+            todo!();
         }
     }
 
     #[allow(unused)]
     #[inline]
-    fn write_two(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> Result<usize, RppalError> {
+    fn write_channel_payload(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 6usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
@@ -120,7 +109,7 @@ impl Maestro {
 
     #[allow(unused)]
     #[inline]
-    fn write_one_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, RppalError> {
+    fn write_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, RppalError> {
         let buffer: [u8; 4usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
@@ -133,7 +122,7 @@ impl Maestro {
 
     #[allow(unused)]
     #[inline]
-    fn write_one(self: &mut Self, command: u8) -> Result<usize, RppalError> {
+    fn write_command(self: &mut Self, command: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 3usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
