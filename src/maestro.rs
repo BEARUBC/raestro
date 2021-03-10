@@ -1,22 +1,36 @@
 /* external crates */
 
 /* external uses */
+#[allow(unused_imports)]
+use std::io::Error;
 use std::boxed::Box;
 use rppal::{
     uart::{
         Parity,
         Uart,
-        Result,
-        Error,
+        Result as RppalResult,
+        Error as RppalError,
     },
+};
+#[allow(unused_imports)]
+use std::sync::{
+    Arc,
+    Mutex,
 };
 
 /* internal mods */
 
 /* internal uses */
+#[allow(unused_imports)]
 use crate::utils::*;
 use crate::maestro_constants::*;
 use crate::maestro_commands::MaestroCommands;
+
+// const W_BUFFER_3: Arc<Mutex<[u8; 6usize]>> = Arc::new(Mutex::new([0u8; 6usize]));
+// const W_BUFFER_4: [u8; 6usize] = [0u8] * 6usize;
+// const W_BUFFER_6: [u8; 6usize] = [0u8] * 6usize;
+
+// const R_BUFFER: [U8, 256usize] = [0u8] * 256usize;
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
@@ -29,11 +43,11 @@ impl Maestro {
         };
     }
 
-    pub fn start(self: &mut Self, baud_rate: BaudRates) -> std::result::Result<(), Error> {
+    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), RppalError> {
         let data_bits: u8 = 8u8;
         let stop_bits: u8 = 1u8;
 
-        let uart_result: Result<Uart> = Uart::new(
+        let uart_result: RppalResult<Uart> = Uart::new(
             baud_rate as u32,
             Parity::None,
             data_bits,
@@ -56,9 +70,10 @@ impl Maestro {
         };
     }
 
-    fn write(self: &mut Self, buffer: &[u8]) -> std::result::Result<usize, Error> {
+    #[allow(unused)]
+    fn write(self: &mut Self, buffer: &[u8]) -> Result<usize, RppalError> {
         if let Some(boxed_uart) = &mut self.uart {
-            let result: Result<usize> = (*boxed_uart).write(buffer);
+            let result: RppalResult<usize> = (*boxed_uart).write(buffer);
             // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
 
             return match result {
@@ -66,15 +81,17 @@ impl Maestro {
                 Err(err_msg) => Err(err_msg),
             };
         } else {
-            return Ok(0usize);
+            // return Ok(0usize);
+            // return Error::SER_SIGNAL_ERR;
+            todo!();
         }
     }
 
     #[allow(unused)]
-    fn read(self: &mut Self) -> std::result::Result<usize, Error> {
+    fn read(self: &mut Self) -> Result<usize, RppalError> {
         if let Some(boxed_uart) = &mut self.uart {
             let mut buffer: [u8;2] = [0,0];
-            let result: Result<usize> = (*boxed_uart).read(&mut buffer);
+            let result: RppalResult<usize> = (*boxed_uart).read(&mut buffer);
             // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
 
             return match result {
@@ -86,11 +103,12 @@ impl Maestro {
         }
     }
 
+    #[allow(unused)]
     #[inline]
-    fn write_two(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> std::result::Result<usize, Error> {
+    fn write_two(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 6usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
+            ProtocolMetadata::SYNC as u8,
+            ProtocolMetadata::DEVICE_NUMBER as u8,
             command,
             channel as u8,
             payload_0,
@@ -100,10 +118,12 @@ impl Maestro {
         return self.write(&buffer);
     }
 
-    fn write_one_channel(self: &mut Self, command: u8, channel: Channels) -> std::result::Result<usize, Error> {
+    #[allow(unused)]
+    #[inline]
+    fn write_one_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, RppalError> {
         let buffer: [u8; 4usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
+            ProtocolMetadata::SYNC as u8,
+            ProtocolMetadata::DEVICE_NUMBER as u8,
             command,
             channel as u8
         ];
@@ -111,101 +131,103 @@ impl Maestro {
         return self.write(&buffer);
     }
 
-    fn write_one(self: &mut Self, command: u8) -> std::result::Result<usize, Error> {
+    #[allow(unused)]
+    #[inline]
+    fn write_one(self: &mut Self, command: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 3usize] = [
-            ProtocolMetaData::SYNC as u8,
-            ProtocolMetaData::DEVICE_NUMBER as u8,
+            ProtocolMetadata::SYNC as u8,
+            ProtocolMetadata::DEVICE_NUMBER as u8,
             command
         ];
 
         return self.write(&buffer);
     }
+
+    #[allow(unused)]
+    fn dispatcher(self: &mut Self, command: CommandFlags, channel: Channels, payload_0: u8, payload_1: u8, microsec: u16) -> Result<usize, RppalError> {
+        // let commandCopy: crate::maestro_constants::CommandFlags = command.clone();
+        // let masked_command: u8 = mask_byte(command as u8);
+        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+        
+
+        // match command {
+        //     CommandFlags::SET_TARGET => { return self.write_two(masked_command, channel, lower, upper); },
+        //     CommandFlags::SET_SPEED => { return self.write_two(masked_command, channel, lower, upper); },
+        //     CommandFlags::SET_ACCELERATION => { return self.write_two(masked_command, channel, lower, upper); },
+        //     CommandFlags::GET_POSITION => { 
+        //         self.write_one_channel(masked_command, channel).unwrap();
+        //         return self.read(); 
+        //     },
+        //     CommandFlags::GET_ERRORS => {
+        //         self.write_one(masked_command);
+
+        //         match self.read() {
+        //             Err(e) => Err(e),
+        //             Ok(0) => Ok(Errors::SER_SIGNAL_ERR as usize),
+        //             Ok(1) => Ok(Errors::SER_OVERRUN_ERR as usize),
+        //             Ok(2) => Ok(Errors::SER_BUFFER_FULL as usize),
+        //             Ok(3) => Ok(Errors::SER_CRC_ERR as usize),
+        //             Ok(4) => Ok(Errors::SER_PROTOCOL_ERR as usize),
+        //             Ok(5) => Ok(Errors::SER_TIMEOUT as usize),
+        //             Ok(6) => Ok(Errors::SCRIPT_STACK_ERR as usize),
+        //             Ok(7) => Ok(Errors::SCRIPT_CALL_STACK_ERR as usize),
+        //             Ok(8) => Ok(Errors::SCRIPT_PC_ERR as usize),
+        //             Ok(_) => std::io::Error{_},
+        //             _ => {},
+        //         }
+        //     },
+        //     CommandFlags::GO_HOME => { return self.write_one(masked_command); },
+        //     CommandFlags::STOP_SCRIPT => { return self.write_one(masked_command); },
+        //     _ => Ok(1),
+        // }
+
+        todo!();
+    }
 }
 
 impl MaestroCommands for Maestro {
-    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::SET_TARGET as u8);
-        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
-
-        return self.write_two(command, channel, lower, upper);
-    }
-
-    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::SET_SPEED as u8);
-        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
-
-        return self.write_two(command, channel, lower, upper);
-
-        // let buffer: [u8; 6usize] = [
-        //     ProtocolMetaData::SYNC as u8,
-        //     ProtocolMetaData::DEVICE_NUMBER as u8,
-        //     command,
-        //     channel as u8,
-        //     lower,
-        //     upper
-        // ];
-
-        // return self.write(&buffer);
-    }
-
-    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::SET_ACCELERATION as u8);
-        let (lower, upper): (u8, u8) = microsec_to_target(value as u16);
-
-        return self.write_two(command, channel, lower, upper);
-
-        // let buffer: [u8; 6usize] = [
-        //     ProtocolMetaData::SYNC as u8,
-        //     ProtocolMetaData::DEVICE_NUMBER as u8,
-        //     command,
-        //     channel as u8,
-        //     lower,
-        //     upper
-        // ];
-
-        // return self.write(&buffer);
-    }
-
-    fn get_position(self: &mut Self, channel: Channels) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::GET_POSITION as u8);
-        
-        self.write_one_channel(command, channel).unwrap();
-
-        return self.read();
+    #[allow(unused)]
+    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, RppalError> {
+        todo!();
+        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+        // return self.dispatcher(CommandFlags::SET_TARGET, channel, lower, upper, microsec);
     }
 
     #[allow(unused)]
-    fn get_errors(self: &mut Self) -> std::result::Result<u16, Error> {
-        let command: u8 = mask_byte(Commands::GET_ERRORS as u8);
-
-        self.write_one(command);
-
-        match self.read() {
-            Err(e) => Err(e),
-            Ok(0) => Ok(ERRORS::SER_SIGNAL_ERR as u16),
-            Ok(1) => Ok(ERRORS::SER_OVERRUN_ERR as u16),
-            Ok(2) => Ok(ERRORS::SER_BUFFER_FULL as u16),
-            Ok(3) => Ok(ERRORS::SER_CRC_ERR as u16),
-            Ok(4) => Ok(ERRORS::SER_PROTOCOL_ERR as u16),
-            Ok(5) => Ok(ERRORS::SER_TIMEOUT as u16),
-            Ok(6) => Ok(ERRORS::SCRIPT_STACK_ERR as u16),
-            Ok(7) => Ok(ERRORS::SCRIPT_CALL_STACK_ERR as u16),
-            Ok(8) => Ok(ERRORS::SCRIPT_PC_ERR as u16),
-            Ok(_) => Err(rppal::uart::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "unkonwn error type"))),
-        }
+    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, RppalError> {
+        todo!();
+        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+        // return self.dispatcher(CommandFlags::SET_SPEED, channel, lower, upper, microsec);
     }
 
     #[allow(unused)]
-    fn go_home(self: &mut Self) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::GO_HOME as u8);
-        
-        return self.write_one(command);
+    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<usize, RppalError> {
+        todo!();
+        // let (lower, upper): (u8, u8) = microsec_to_target(value.into());
+        // return self.dispatcher(CommandFlags::SET_ACCELERATION, channel, lower, upper, value.into());
     }
 
     #[allow(unused)]
-    fn stop_script(self: &mut Self) -> std::result::Result<usize, Error> {
-        let command: u8 = mask_byte(Commands::STOP_SCRIPT as u8);
-        
-        return self.write_one(command);
+    fn get_position(self: &mut Self, channel: Channels) -> Result<usize, RppalError> {
+        todo!();
+        // return self.dispatcher(CommandFlags::GET_POSITION, channel, 0, 0, 0);
+    }
+
+    #[allow(unused)]
+    fn get_errors(self: &mut Self) -> Result<usize, RppalError> {
+        todo!();
+        // return self.dispatcher(CommandFlags::GET_ERRORS, Channels::C_0, 0, 0, 0);
+    }
+
+    #[allow(unused)]
+    fn go_home(self: &mut Self) -> Result<usize, RppalError> {
+        todo!();
+        // return self.dispatcher(CommandFlags::GO_HOME, Channels::C_0, 0, 0, 0);
+    }
+
+    #[allow(unused)]
+    fn stop_script(self: &mut Self) -> Result<usize, RppalError> {
+        todo!();
+        // return self.dispatcher(CommandFlags::STOP_SCRIPT, Channels::C_0, 0, 0, 0);
     }
 }

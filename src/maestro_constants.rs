@@ -8,14 +8,15 @@
 
 #[allow(non_camel_case_types)]
 #[repr(u8)]
-pub(crate) enum ProtocolMetaData {
+pub(crate) enum ProtocolMetadata {
     SYNC = 0xaau8,
     DEVICE_NUMBER = 0x0cu8,
 }
 
 #[allow(non_camel_case_types, unused)]
 #[repr(u8)]
-pub(crate) enum Commands {
+#[derive(Clone)]
+pub(crate) enum CommandFlags {
     SET_TARGET = 0x84u8,
     SET_SPEED = 0x87u8,
     SET_ACCELERATION = 0x89u8,
@@ -48,7 +49,7 @@ pub enum BaudRates {
 
 #[allow(non_camel_case_types)]
 #[repr(u16)]
-pub enum ERRORS {
+pub enum Errors {
     SER_SIGNAL_ERR = 0u16,
     SER_OVERRUN_ERR = 1u16,
     SER_BUFFER_FULL = 2u16,
