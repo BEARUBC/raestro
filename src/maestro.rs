@@ -3,6 +3,7 @@
 /* external uses */
 #[allow(unused_imports)]
 use std::io::Error;
+use std::io::ErrorKind;
 use std::boxed::Box;
 use rppal::{
     uart::{
@@ -10,6 +11,11 @@ use rppal::{
         Uart,
         Result as RppalResult,
         Error as RppalError,
+        Error::{
+            Io,
+            Gpio,
+            InvalidValue
+        }
     },
 };
 #[allow(unused_imports)]
@@ -42,8 +48,25 @@ impl Maestro {
             uart: None,
         };
     }
+    
+    // pub fn deconstructError(rppal_err: RppalError) -> Error {
+    //     // err_msg is of type RppalError
+    //     return match rppal_err {
+    //         Io(std_err) => Err(std_err),
+    //         Gpio(gpio_err) => {
+    //             return match gpio_err {
+    //                 rppal::gpio::Error::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+    //                 rppal::gpio::Error::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+    //                 rppal::gpio::Error::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+    //                 rppal::gpio::Error::Io(error) => Err(error),
+    //                 rppal::gpio::Error::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+    //             }
+    //         },
+    //         InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+    //     }
+    // }
 
-    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), RppalError> {
+    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), Error> {
         let data_bits: u8 = 8u8;
         let stop_bits: u8 = 1u8;
 
@@ -59,7 +82,23 @@ impl Maestro {
                 self.uart = Some(Box::new(uart));
                 Ok(())
             },
-            Err(err_msg) => Err(err_msg),
+            // Err(err_msg) => Err(err_msg),
+            Err(rppal_err) => {
+                // err_msg is of type RppalError
+                return match rppal_err {
+                    Io(std_err) => Err(std_err),
+                    Gpio(gpio_err) => {
+                        return match gpio_err {
+                            rppal::gpio::Error::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+                            rppal::gpio::Error::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+                            rppal::gpio::Error::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+                            rppal::gpio::Error::Io(error) => Err(error),
+                            rppal::gpio::Error::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+                        }
+                    },
+                    InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+                };
+            },
         };
     }
 
