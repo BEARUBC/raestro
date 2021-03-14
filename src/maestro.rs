@@ -72,10 +72,9 @@ impl Maestro {
     }
 
     #[allow(unused)]
-    fn read(self: &mut Self) -> Result<usize, Error> {
+    fn read(self: &mut Self, buffer: &mut [u8]) -> Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            let mut buffer: [u8;2] = [0,0];
-            let result: RppalResult<usize> = (*boxed_uart).read(&mut buffer);
+            let result: RppalResult<usize> = (*boxed_uart).read(buffer);
 
             return match result {
                 Ok(bits_read) => Ok(bits_read),
