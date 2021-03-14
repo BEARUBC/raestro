@@ -1,7 +1,7 @@
 /* external crates */
-
+use std::io::Error;
 /* external uses */
-use rppal::uart::Error as RppalError;
+// use rppal::uart::Error as RppalError;
 
 /* internal mods */
 
@@ -12,7 +12,7 @@ use crate::maestro_constants::{
     CommandFlags,
 };
 
-type ResultType = Result<usize, RppalError>;
+type ResultType = Result<usize, Error>;
 
 pub trait MaestroCommands {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> ResultType;

@@ -11,12 +11,13 @@ use rppal::{
         Uart,
         Result as RppalResult,
         Error as RppalError,
-        Error::{
-            Io,
-            Gpio,
-            InvalidValue
-        }
+        // Error::{
+        //     Io,
+        //     Gpio,
+        //     InvalidValue
+        // },
     },
+    gpio::Error as GpioError,
 };
 #[allow(unused_imports)]
 use std::sync::{
@@ -51,33 +52,33 @@ impl Maestro {
     
     pub fn deconstruct_error_0(rppal_err: RppalError) -> Result<(), Error> {
         return match rppal_err {
-            Io(std_err) => Err(std_err),
-            Gpio(gpio_err) => {
+            RppalError::Io(std_err) => Err(std_err),
+            RppalError::Gpio(gpio_err) => {
                 return match gpio_err {
-                    rppal::gpio::Error::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
-                    rppal::gpio::Error::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
-                    rppal::gpio::Error::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
-                    rppal::gpio::Error::Io(error) => Err(error),
-                    rppal::gpio::Error::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+                    GpioError::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+                    GpioError::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+                    GpioError::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+                    GpioError::Io(error) => Err(error),
+                    GpioError::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
                 }
             },
-            InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+            RppalError::InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
         };
     }
 
     pub fn deconstruct_error_1(rppal_err: RppalError) -> Result<usize, Error> {
         return match rppal_err {
-            Io(std_err) => Err(std_err),
-            Gpio(gpio_err) => {
+            RppalError::Io(std_err) => Err(std_err),
+            RppalError::Gpio(gpio_err) => {
                 return match gpio_err {
-                    rppal::gpio::Error::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
-                    rppal::gpio::Error::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
-                    rppal::gpio::Error::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
-                    rppal::gpio::Error::Io(error) => Err(error),
-                    rppal::gpio::Error::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+                    GpioError::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+                    GpioError::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+                    GpioError::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+                    GpioError::Io(error) => Err(error),
+                    GpioError::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
                 }
             },
-            InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+            RppalError::InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
         };
     }
 
