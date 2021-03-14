@@ -33,12 +33,6 @@ use crate::utils::*;
 use crate::maestro_constants::*;
 use crate::maestro_commands::MaestroCommands;
 
-// const W_BUFFER_3: Arc<Mutex<[u8; 6usize]>> = Arc::new(Mutex::new([0u8; 6usize]));
-// const W_BUFFER_4: [u8; 6usize] = [0u8] * 6usize;
-// const W_BUFFER_6: [u8; 6usize] = [0u8] * 6usize;
-
-// const R_BUFFER: [U8, 256usize] = [0u8] * 256usize;
-
 pub struct Maestro {
     uart: Option<Box<Uart>>,
 }
@@ -117,7 +111,7 @@ impl Maestro {
     #[allow(unused)]
     fn write(self: &mut Self, buffer: &[u8]) -> Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            let result: RppalResult<usize> = (*boxed_uart).write(buffer);
+let result: RppalResult<usize> = (*boxed_uart).write(buffer);
             // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
 
             return match result {
@@ -144,13 +138,13 @@ impl Maestro {
                 Err(err_msg) => Maestro::deconstruct_error_1(err_msg),
             };
         } else {
-            return Ok(0usize);
+            todo!();
         }
     }
 
     #[allow(unused)]
     #[inline]
-    fn write_two(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> Result<usize, Error> {
+    fn write_channel_payload(self: &mut Self, command: u8, channel: Channels, payload_0: u8, payload_1: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 6usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
@@ -165,7 +159,7 @@ impl Maestro {
 
     #[allow(unused)]
     #[inline]
-    fn write_one_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, Error> {
+    fn write_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, RppalError> {
         let buffer: [u8; 4usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
@@ -178,7 +172,7 @@ impl Maestro {
 
     #[allow(unused)]
     #[inline]
-    fn write_one(self: &mut Self, command: u8) -> Result<usize, Error> {
+    fn write_command(self: &mut Self, command: u8) -> Result<usize, RppalError> {
         let buffer: [u8; 3usize] = [
             ProtocolMetadata::SYNC as u8,
             ProtocolMetadata::DEVICE_NUMBER as u8,
