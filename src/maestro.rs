@@ -73,16 +73,17 @@ impl Maestro {
 
     #[allow(unused)]
     fn read(self: &mut Self, buffer: &mut [u8]) -> Result<usize, Error> {
-        if let Some(boxed_uart) = &mut self.uart {
-            let result: RppalResult<usize> = (*boxed_uart).read(buffer);
+        todo!();
+        // if let Some(boxed_uart) = &mut self.uart {
+        //     let result: RppalResult<usize> = (*boxed_uart).read(buffer);
 
-            return match result {
-                Ok(bits_read) => Ok(bits_read),
-                Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
-            };
-        } else {
-            return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
-        }
+        //     return match result {
+        //         Ok(bits_read) => Ok(bits_read),
+        //         Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
+        //     };
+        // } else {
+        //     return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
+        // }
     }
 
     #[inline]
@@ -99,6 +100,7 @@ impl Maestro {
         return self.write(&buffer);
     }
 
+    #[allow(unused)]
     #[inline]
     fn write_channel(self: &mut Self, command: u8, channel: Channels) -> Result<usize, Error> {
         let buffer: [u8; 4usize] = [
@@ -159,14 +161,18 @@ impl MaestroCommands for Maestro {
         return self.write_channel_payload(command, channel, lower, upper);
     }
 
+    #[allow(unused)]
     fn get_position(self: &mut Self, channel: Channels) -> Result<usize, Error> {
-        let command = mask_byte(CommandFlags::GET_POSITION as u8);
-        return self.write_channel(command, channel);
+        todo!();
+        // let command = mask_byte(CommandFlags::GET_POSITION as u8);
+        // return self.write_channel(command, channel);
     }
 
+    #[allow(unused)]
     fn get_errors(self: &mut Self) -> Result<usize, Error> {
-        let command = mask_byte(CommandFlags::GET_POSITION as u8);
-        return self.write_command(command);
+        todo!();
+        // let command = mask_byte(CommandFlags::GET_POSITION as u8);
+        // return self.write_command(command);
     }
 
     fn go_home(self: &mut Self) -> Result<usize, Error> {
