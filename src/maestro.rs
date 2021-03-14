@@ -1,8 +1,10 @@
 /* external crates */
 
 /* external uses */
-use std::io::Error;
-use std::io::ErrorKind;
+use std::io::{
+    Error,
+    ErrorKind,
+};
 use std::boxed::Box;
 use rppal::{
     uart::{
@@ -65,13 +67,7 @@ impl Maestro {
                 Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
             };
         } else {
-            // return Ok(0usize);
-            // return Error::SER_SIGNAL_ERR;
-            // return Ok(0usize);
-
-            // !!! Todo because we technically shouldn't be returning 0usize if the Maestro struct hasn't been initialized yet!
-            // Don't remove todo!() until this has been solved!
-            todo!();
+            return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
         }
     }
 
@@ -86,9 +82,7 @@ impl Maestro {
                 Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
             };
         } else {
-            // !!! Todo because we technically shouldn't be returning 0usize if the Maestro struct hasn't been initialized yet!
-            // Don't remove todo!() until this has been solved!
-            todo!();
+            return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
         }
     }
 
@@ -172,7 +166,6 @@ impl MaestroCommands for Maestro {
     }
 
     fn get_errors(self: &mut Self) -> Result<usize, Error> {
-        
         let command = mask_byte(CommandFlags::GET_POSITION as u8);
         return self.write_command(command);
     }
