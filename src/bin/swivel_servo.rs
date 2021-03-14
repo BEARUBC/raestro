@@ -1,9 +1,13 @@
+/* external crates */
+
+/* external uses */
 use std::thread;
 use std::time::Duration;
+use raestro::prelude::*;
 
-use raestro::maestro::*;
-use raestro::maestro_commands::MaestroCommands;
-use raestro::maestro_constants::*;
+/* internal mods */
+
+/* internal uses */
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
