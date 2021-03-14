@@ -3,6 +3,7 @@
 /* external uses */
 #[allow(unused_imports)]
 use std::io::Error;
+use std::io::ErrorKind;
 use std::boxed::Box;
 use rppal::{
     uart::{
@@ -10,7 +11,13 @@ use rppal::{
         Uart,
         Result as RppalResult,
         Error as RppalError,
+        // Error::{
+        //     Io,
+        //     Gpio,
+        //     InvalidValue
+        // },
     },
+    gpio::Error as GpioError,
 };
 #[allow(unused_imports)]
 use std::sync::{
@@ -36,8 +43,40 @@ impl Maestro {
             uart: None,
         };
     }
+    
+    pub fn deconstruct_error_0(rppal_err: RppalError) -> Result<(), Error> {
+        return match rppal_err {
+            RppalError::Io(std_err) => Err(std_err),
+            RppalError::Gpio(gpio_err) => {
+                return match gpio_err {
+                    GpioError::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+                    GpioError::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+                    GpioError::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+                    GpioError::Io(error) => Err(error),
+                    GpioError::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+                }
+            },
+            RppalError::InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+        };
+    }
 
-    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), RppalError> {
+    pub fn deconstruct_error_1(rppal_err: RppalError) -> Result<usize, Error> {
+        return match rppal_err {
+            RppalError::Io(std_err) => Err(std_err),
+            RppalError::Gpio(gpio_err) => {
+                return match gpio_err {
+                    GpioError::UnknownModel => Err(Error::new(ErrorKind::Other, "unknown model")),
+                    GpioError::PinNotAvailable(pin) => Err(Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin))),
+                    GpioError::PermissionDenied(err_string) => Err(Error::new(ErrorKind::PermissionDenied, format!("Permission denied: {} ", err_string))),
+                    GpioError::Io(error) => Err(error),
+                    GpioError::ThreadPanic => Err(Error::new(ErrorKind::Other, "Thread panic")),
+                }
+            },
+            RppalError::InvalidValue => Err(Error::new(ErrorKind::Other, "Invalid Value")),
+        };
+    }
+
+    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), Error> {
         let data_bits: u8 = 8u8;
         let stop_bits: u8 = 1u8;
 
@@ -53,7 +92,12 @@ impl Maestro {
                 self.uart = Some(Box::new(uart));
                 Ok(())
             },
-            Err(err_msg) => Err(err_msg),
+            // Err(err_msg) => Err(err_msg),
+            Err(rppal_err) => {
+                // err_msg is of type RppalError
+                return Maestro::deconstruct_error_0(rppal_err)
+
+            },
         };
     }
 
@@ -65,28 +109,34 @@ impl Maestro {
     }
 
     #[allow(unused)]
-    fn write(self: &mut Self, buffer: &[u8]) -> Result<usize, RppalError> {
+    fn write(self: &mut Self, buffer: &[u8]) -> Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            // let result: RppalResult<usize> = (*boxed_uart).write(buffer);
-            // return match result {
-            //     Ok(bits_read) => Ok(bits_read),
-            //     Err(err_msg) => Err(err_msg),
-            // };
-            todo!();
+let result: RppalResult<usize> = (*boxed_uart).write(buffer);
+            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
+
+            return match result {
+                Ok(bits_read) => Ok(bits_read),
+                Err(err_msg) => Maestro::deconstruct_error_1(err_msg),
+            };
         } else {
-            todo!();
+            // return Ok(0usize);
+            // return Error::SER_SIGNAL_ERR;
+            // todo!();
+            return Ok(0usize);
         }
     }
 
     #[allow(unused)]
-    fn read(self: &mut Self, buffer: &mut [u8]) -> Result<usize, RppalError> {
+    fn read(self: &mut Self) -> Result<usize, Error> {
         if let Some(boxed_uart) = &mut self.uart {
-            // let result: RppalResult<usize> = (*boxed_uart).read(buffer);
-            // return match result {
-            //     Ok(bits_read) => Ok(bits_read),
-            //     Err(err_msg) => Err(err_msg),
-            // };
-            todo!();
+            let mut buffer: [u8;2] = [0,0];
+            let result: RppalResult<usize> = (*boxed_uart).read(&mut buffer);
+            // let result: Result<usize> = (*boxed_uart).write(&BUFFER);
+
+            return match result {
+                Ok(bits_read) => Ok(result.unwrap()),
+                Err(err_msg) => Maestro::deconstruct_error_1(err_msg),
+            };
         } else {
             todo!();
         }
@@ -133,90 +183,80 @@ impl Maestro {
     }
 
     #[allow(unused)]
-    fn dispatcher(self: &mut Self, command: CommandFlags, channel: Channels, payload_0: u8, payload_1: u8, microsec: u16) -> Result<usize, RppalError> {
-        // let commandCopy: crate::maestro_constants::CommandFlags = command.clone();
-        // let masked_command: u8 = mask_byte(command as u8);
-        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+    fn dispatcher(self: &mut Self, command: CommandFlags, channel: Channels, payload_0: u8, payload_1: u8, microsec: u16) -> Result<usize, Error> {
+        let command_copy: crate::maestro_constants::CommandFlags = command.clone();
+        let masked_command: u8 = mask_byte(command as u8);
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
         
 
-        // match command {
-        //     CommandFlags::SET_TARGET => { return self.write_two(masked_command, channel, lower, upper); },
-        //     CommandFlags::SET_SPEED => { return self.write_two(masked_command, channel, lower, upper); },
-        //     CommandFlags::SET_ACCELERATION => { return self.write_two(masked_command, channel, lower, upper); },
-        //     CommandFlags::GET_POSITION => { 
-        //         self.write_one_channel(masked_command, channel).unwrap();
-        //         return self.read(); 
-        //     },
-        //     CommandFlags::GET_ERRORS => {
-        //         self.write_one(masked_command);
+        match command_copy {
+            CommandFlags::SET_TARGET => { return self.write_two(masked_command, channel, lower, upper); },
+            CommandFlags::SET_SPEED => { return self.write_two(masked_command, channel, lower, upper); },
+            CommandFlags::SET_ACCELERATION => { return self.write_two(masked_command, channel, lower, upper); },
+            CommandFlags::GET_POSITION => { 
+                self.write_one_channel(masked_command, channel).unwrap();
+                return self.read(); 
+            },
+            CommandFlags::GET_ERRORS => {
+                self.write_one(masked_command);
 
-        //         match self.read() {
-        //             Err(e) => Err(e),
-        //             Ok(0) => Ok(Errors::SER_SIGNAL_ERR as usize),
-        //             Ok(1) => Ok(Errors::SER_OVERRUN_ERR as usize),
-        //             Ok(2) => Ok(Errors::SER_BUFFER_FULL as usize),
-        //             Ok(3) => Ok(Errors::SER_CRC_ERR as usize),
-        //             Ok(4) => Ok(Errors::SER_PROTOCOL_ERR as usize),
-        //             Ok(5) => Ok(Errors::SER_TIMEOUT as usize),
-        //             Ok(6) => Ok(Errors::SCRIPT_STACK_ERR as usize),
-        //             Ok(7) => Ok(Errors::SCRIPT_CALL_STACK_ERR as usize),
-        //             Ok(8) => Ok(Errors::SCRIPT_PC_ERR as usize),
-        //             Ok(_) => std::io::Error{_},
-        //             _ => {},
-        //         }
-        //     },
-        //     CommandFlags::GO_HOME => { return self.write_one(masked_command); },
-        //     CommandFlags::STOP_SCRIPT => { return self.write_one(masked_command); },
-        //     _ => Ok(1),
-        // }
-
-        todo!();
+                match self.read() {
+                    Err(e) => Err(e),
+                    Ok(0) => Ok(Errors::SER_SIGNAL_ERR as usize),
+                    Ok(1) => Ok(Errors::SER_OVERRUN_ERR as usize),
+                    Ok(2) => Ok(Errors::SER_BUFFER_FULL as usize),
+                    Ok(3) => Ok(Errors::SER_CRC_ERR as usize),
+                    Ok(4) => Ok(Errors::SER_PROTOCOL_ERR as usize),
+                    Ok(5) => Ok(Errors::SER_TIMEOUT as usize),
+                    Ok(6) => Ok(Errors::SCRIPT_STACK_ERR as usize),
+                    Ok(7) => Ok(Errors::SCRIPT_CALL_STACK_ERR as usize),
+                    Ok(8) => Ok(Errors::SCRIPT_PC_ERR as usize),
+                    _ => { Err(Error::new(ErrorKind::Other, "uh oh, spaghettio's"))},
+                }
+            },
+            CommandFlags::GO_HOME => { return self.write_one(masked_command); },
+            CommandFlags::STOP_SCRIPT => { return self.write_one(masked_command); },
+            _ => Ok(1),
+        }
     }
 }
 
 impl MaestroCommands for Maestro {
     #[allow(unused)]
-    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, RppalError> {
-        todo!();
-        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
-        // return self.dispatcher(CommandFlags::SET_TARGET, channel, lower, upper, microsec);
+    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, Error> {
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+        return self.dispatcher(CommandFlags::SET_TARGET, channel, lower, upper, microsec);
     }
 
     #[allow(unused)]
-    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, RppalError> {
-        todo!();
-        // let (lower, upper): (u8, u8) = microsec_to_target(microsec);
-        // return self.dispatcher(CommandFlags::SET_SPEED, channel, lower, upper, microsec);
+    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<usize, Error> {
+        let (lower, upper): (u8, u8) = microsec_to_target(microsec);
+        return self.dispatcher(CommandFlags::SET_SPEED, channel, lower, upper, microsec);
     }
 
     #[allow(unused)]
-    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<usize, RppalError> {
-        todo!();
-        // let (lower, upper): (u8, u8) = microsec_to_target(value.into());
-        // return self.dispatcher(CommandFlags::SET_ACCELERATION, channel, lower, upper, value.into());
+    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<usize, Error> {
+        let (lower, upper): (u8, u8) = microsec_to_target(value.into());
+        return self.dispatcher(CommandFlags::SET_ACCELERATION, channel, lower, upper, value.into());
     }
 
     #[allow(unused)]
-    fn get_position(self: &mut Self, channel: Channels) -> Result<usize, RppalError> {
-        todo!();
-        // return self.dispatcher(CommandFlags::GET_POSITION, channel, 0, 0, 0);
+    fn get_position(self: &mut Self, channel: Channels) -> Result<usize, Error> {
+        return self.dispatcher(CommandFlags::GET_POSITION, channel, 0, 0, 0);
     }
 
     #[allow(unused)]
-    fn get_errors(self: &mut Self) -> Result<usize, RppalError> {
-        todo!();
-        // return self.dispatcher(CommandFlags::GET_ERRORS, Channels::C_0, 0, 0, 0);
+    fn get_errors(self: &mut Self) -> Result<usize, Error> {
+        return self.dispatcher(CommandFlags::GET_ERRORS, Channels::C_0, 0, 0, 0);
     }
 
     #[allow(unused)]
-    fn go_home(self: &mut Self) -> Result<usize, RppalError> {
-        todo!();
-        // return self.dispatcher(CommandFlags::GO_HOME, Channels::C_0, 0, 0, 0);
+    fn go_home(self: &mut Self) -> Result<usize, Error> {
+        return self.dispatcher(CommandFlags::GO_HOME, Channels::C_0, 0, 0, 0);
     }
 
     #[allow(unused)]
-    fn stop_script(self: &mut Self) -> Result<usize, RppalError> {
-        todo!();
-        // return self.dispatcher(CommandFlags::STOP_SCRIPT, Channels::C_0, 0, 0, 0);
+    fn stop_script(self: &mut Self) -> Result<usize, Error> {
+        return self.dispatcher(CommandFlags::STOP_SCRIPT, Channels::C_0, 0, 0, 0);
     }
 }
