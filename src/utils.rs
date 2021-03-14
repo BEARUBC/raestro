@@ -6,14 +6,12 @@
 
 /* internal uses */
 
-#[allow(unused)]
 #[inline]
 pub(crate) fn mask_byte(byte: u8) -> u8 {
     let top_mask: u8 = 0x7fu8;
     return byte & top_mask;
 }
 
-#[allow(unused)]
 pub(crate) fn microsec_to_target(mut microsec: u16) -> (u8, u8) {
     let multiplier: u8 = 2u8;
     let down_shift: u8 = 7u8;

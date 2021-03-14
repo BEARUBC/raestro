@@ -1,16 +1,12 @@
 /* external crates */
-use std::io::Error;
+
 /* external uses */
-// use rppal::uart::Error as RppalError;
+use std::io::Error;
 
 /* internal mods */
 
 /* internal uses */
-#[allow(unused_imports)]
-use crate::maestro_constants::{
-    Channels,
-    CommandFlags,
-};
+use crate::maestro_constants::Channels;
 
 type ResultType = Result<usize, Error>;
 
@@ -22,5 +18,4 @@ pub trait MaestroCommands {
     fn get_errors(self: &mut Self) -> ResultType;
     fn go_home(self: &mut Self) -> ResultType;
     fn stop_script(self: &mut Self) -> ResultType;
-    // fn dispatcher(self: &mut Self, command: CommandFlags, channel: Channels, payload_0: u8, payload_1: u8, microsec: u16) -> ResultType;
 }
