@@ -73,17 +73,16 @@ impl Maestro {
 
     #[allow(unused)]
     fn read(self: &mut Self, buffer: &mut [u8]) -> Result<usize, Error> {
-        todo!();
-        // if let Some(boxed_uart) = &mut self.uart {
-        //     let result: RppalResult<usize> = (*boxed_uart).read(buffer);
+        if let Some(boxed_uart) = &mut self.uart {
+            let result: RppalResult<usize> = (*boxed_uart).read(buffer);
 
-        //     return match result {
-        //         Ok(bits_read) => Ok(bits_read),
-        //         Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
-        //     };
-        // } else {
-        //     return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
-        // }
+            return match result {
+                Ok(bits_read) => Ok(bits_read),
+                Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
+            };
+        } else {
+            return Err(Error::new(ErrorKind::NotConnected, "Maestro not initialized. Consider calling .start()"));
+        }
     }
 
     #[inline]
@@ -163,9 +162,18 @@ impl MaestroCommands for Maestro {
 
     #[allow(unused)]
     fn get_position(self: &mut Self, channel: Channels) -> Result<usize, Error> {
-        todo!();
-        // let command = mask_byte(CommandFlags::GET_POSITION as u8);
-        // return self.write_channel(command, channel);
+        let command = mask_byte(CommandFlags::GET_POSITION as u8);
+        match self.write_channel(command, channel) {
+            Err(err) => Err(err),
+            Ok(bits_read) => {
+                let mut buffer: [u8; 2usize] = [0,0]; 
+                match self.read(&mut buffer) {
+                    Err(err) => Err(err),
+                    Ok(bits_read) => Ok( (buffer[1] << 8 + buffer[0]).into() ),
+                }
+            }
+        }
+        
     }
 
     #[allow(unused)]
@@ -185,41 +193,3 @@ impl MaestroCommands for Maestro {
         return self.write_command(command);
     }
 }
-
-// #[allow(unused)]
-// fn dispatcher(self: &mut Self, command: CommandFlags, channel: Channels, payload_0: u8, payload_1: u8, microsec: u16) -> Result<usize, Error> {
-//     let command_copy: crate::maestro_constants::CommandFlags = command.clone();
-//     let masked_command: u8 = mask_byte(command as u8);
-//     let (lower, upper): (u8, u8) = microsec_to_target(microsec);
-    
-
-//     match command_copy {
-//         CommandFlags::SET_TARGET => { return self.write_two(masked_command, channel, lower, upper); },
-//         CommandFlags::SET_SPEED => { return self.write_two(masked_command, channel, lower, upper); },
-//         CommandFlags::SET_ACCELERATION => { return self.write_two(masked_command, channel, lower, upper); },
-//         CommandFlags::GET_POSITION => { 
-//             self.write_one_channel(masked_command, channel).unwrap();
-//             return self.read(); 
-//         },
-//         CommandFlags::GET_ERRORS => {
-//             self.write_one(masked_command);
-
-//             match self.read() {
-//                 Err(e) => Err(e),
-//                 Ok(0) => Ok(Errors::SER_SIGNAL_ERR as usize),
-//                 Ok(1) => Ok(Errors::SER_OVERRUN_ERR as usize),
-//                 Ok(2) => Ok(Errors::SER_BUFFER_FULL as usize),
-//                 Ok(3) => Ok(Errors::SER_CRC_ERR as usize),
-//                 Ok(4) => Ok(Errors::SER_PROTOCOL_ERR as usize),
-//                 Ok(5) => Ok(Errors::SER_TIMEOUT as usize),
-//                 Ok(6) => Ok(Errors::SCRIPT_STACK_ERR as usize),
-//                 Ok(7) => Ok(Errors::SCRIPT_CALL_STACK_ERR as usize),
-//                 Ok(8) => Ok(Errors::SCRIPT_PC_ERR as usize),
-//                 _ => { Err(Error::new(ErrorKind::Other, "uh oh, spaghettio's"))},
-//             }
-//         },
-//         CommandFlags::GO_HOME => { return self.write_one(masked_command); },
-//         CommandFlags::STOP_SCRIPT => { return self.write_one(masked_command); },
-//         _ => Ok(1),
-//     }
-// }
