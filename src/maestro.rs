@@ -45,6 +45,8 @@ impl Maestro {
             stop_bits
         );
 
+        
+
         return match uart_result {
             Ok(uart) => Ok(self.uart = Some(Box::new(uart))),
             Err(rppal_err) => Err(Maestro::deconstruct_error(rppal_err)),
@@ -169,7 +171,7 @@ impl MaestroCommands for Maestro {
                 let mut buffer: [u8; 2usize] = [0,0]; 
                 match self.read(&mut buffer) {
                     Err(err) => Err(err),
-                    Ok(bits_read) => Ok( (buffer[1] << 8 + buffer[0]).into() ),
+                    Ok(bits_read) => Ok( (buffer[1] << 8 + buffer[0]).into() ),   
                 }
             }
         }
