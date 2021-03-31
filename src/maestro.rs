@@ -71,19 +71,8 @@ impl Maestro {
         self.write_buf = None;
     }
 
-    fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
-        if length <= 2usize {
-            panic!();
-        }
-
-        let slice = &self.write_buf
-            .as_mut()
-            .unwrap()
-            .as_mut()[0usize..length];
-
-        return self.uart.as_mut().unwrap().write(slice)
-            .map(|bytes_written| bytes_written)
-            .map_err(|rppal_err| Maestro::deconstruct_error(rppal_err));
+    pub fn get_read_buffer(self: &Self) -> Option<Box<[u8; 6usize]>> {
+        return self.read_buf.clone();
     }
 
     #[allow(unused)]
@@ -98,6 +87,21 @@ impl Maestro {
             .as_mut()[0usize..length];
 
         return self.uart.as_mut().unwrap().read(slice)
+            .map(|bytes_written| bytes_written)
+            .map_err(|rppal_err| Maestro::deconstruct_error(rppal_err));
+    }
+
+    fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
+        if length <= 2usize {
+            panic!();
+        }
+
+        let slice = &self.write_buf
+            .as_mut()
+            .unwrap()
+            .as_mut()[0usize..length];
+
+        return self.uart.as_mut().unwrap().write(slice)
             .map(|bytes_written| bytes_written)
             .map_err(|rppal_err| Maestro::deconstruct_error(rppal_err));
     }
@@ -255,7 +259,7 @@ impl MaestroCommands for Maestro {
         todo!();
     }
     #[allow(unused)]
-    fn get_position(self: &mut Self, channel: Channels, mut buffer: [u8; 2usize]) -> ResultType {
+    fn get_position(self: &mut Self, channel: Channels) -> ResultType {
         // let command = mask_byte(CommandFlags::GET_POSITION as u8);
         // let expected_read_buf_size = 2usize;
 
@@ -280,8 +284,7 @@ impl MaestroCommands for Maestro {
         todo!();
     }
 
-    #[allow(unused)]
-    fn get_errors(self: &mut Self, mut buffer: [u8; 2usize]) -> ResultType {
+    fn get_errors(self: &mut Self) -> ResultType {
         // let command = mask_byte(CommandFlags::GET_POSITION as u8);
         // return self.write_buf_command(command);
 

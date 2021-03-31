@@ -16,6 +16,6 @@ pub trait MaestroCommands {
     fn go_home(self: &mut Self) -> ResultType;
     fn stop_script(self: &mut Self) -> ResultType;
 
-    fn get_position(self: &mut Self, channel: Channels, buffer: [u8; 2usize]) -> ResultType;
-    fn get_errors(self: &mut Self, buffer: [u8; 2usize]) -> ResultType;
+    fn get_position(self: &mut Self, channel: Channels) -> ResultType;
+    fn get_errors(self: &mut Self) -> ResultType;
 }
