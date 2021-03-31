@@ -75,7 +75,6 @@ impl Maestro {
         return self.read_buf.clone();
     }
 
-    #[allow(unused)]
     fn read(self: &mut Self, length: usize) -> Result<usize, Error> {
         if length <= 2usize {
             panic!();
@@ -113,7 +112,7 @@ impl Maestro {
         channel: Channels,
         payload_0: u8,
         payload_1: u8
-    ) -> Result<(), Error> {
+    ) -> UnitResultType {
         let buffer = self.write_buf
             .as_mut()
             .unwrap()
@@ -170,9 +169,8 @@ impl Maestro {
         // };
     }
 
-    #[allow(unused)]
     #[inline]
-    fn write_channel(self: &mut Self, command: u8, channel: Channels) -> Result<(), Error> {
+    fn write_channel(self: &mut Self, command: u8, channel: Channels) -> UnitResultType {
         let buffer = self.write_buf
             .as_mut()
             .unwrap()
@@ -185,9 +183,8 @@ impl Maestro {
             .map(|_| ());
     }
 
-    #[allow(unused)]
     #[inline]
-    fn write_command(self: &mut Self, command: u8) -> Result<(), Error> {
+    fn write_command(self: &mut Self, command: u8) -> UnitResultType {
         let buffer = self.write_buf
             .as_mut()
             .unwrap()
@@ -215,7 +212,7 @@ impl Maestro {
 }
 
 impl MaestroCommands for Maestro {
-    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> ResultType {
+    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
         let command = mask_byte(CommandFlags::SET_TARGET as u8);
         let (lower, upper) = microsec_to_target(microsec);
 
@@ -225,7 +222,7 @@ impl MaestroCommands for Maestro {
         };
     }
 
-    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> ResultType {
+    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
         let command = mask_byte(CommandFlags::SET_SPEED as u8);
         let (lower, upper) = microsec_to_target(microsec);
 
@@ -235,7 +232,7 @@ impl MaestroCommands for Maestro {
         };
     }
 
-    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> ResultType {
+    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> UnitResultType {
         let command = mask_byte(CommandFlags::SET_ACCELERATION as u8);
         let (lower, upper) = microsec_to_target(value as u16);
 
@@ -245,49 +242,88 @@ impl MaestroCommands for Maestro {
         };
     }
 
-    fn go_home(self: &mut Self) -> ResultType {
-        // let command = mask_byte(CommandFlags::GO_HOME as u8);
-        // return self.write_buf_command(command);
+    fn go_home(self: &mut Self) -> UnitResultType {
+        let command = mask_byte(CommandFlags::GO_HOME as u8);
 
-        todo!();
+        return match self.write_buf {
+            Some(_) => self.write_command(command),
+            _ => todo!(),
+        }
     }
 
-    fn stop_script(self: &mut Self) -> ResultType {
-        // let command = mask_byte(CommandFlags::STOP_SCRIPT as u8);
-        // return self.write_buf_command(command);
+    fn stop_script(self: &mut Self) -> UnitResultType {
+        let command = mask_byte(CommandFlags::STOP_SCRIPT as u8);
 
-        todo!();
-    }
-    #[allow(unused)]
-    fn get_position(self: &mut Self, channel: Channels) -> ResultType {
-        // let command = mask_byte(CommandFlags::GET_POSITION as u8);
-        // let expected_read_buf_size = 2usize;
-
-        // return match self.write_buf_channel(command, channel) {
-        //     Err(err) => Err(err),
-        //     Ok(_) => {
-        //         match self.read_buf(&mut buffer) {
-        //             Ok(bytes_read_buf) => match bytes_read_buf == expected_read_buf_size {
-        //                 true => Ok(()),
-        //                 _ => {
-        //                     let err_type = ErrorKind::ConnectionAborted;
-        //                     let err_msg = "maestro message could not be read_buf";
-
-        //                     Err(Error::new(err_type, err_msg))
-        //                 },
-        //             },
-        //             Err(err) => Err(err),
-        //         }
-        //     },
-        // };
-
-        todo!();
+        return match self.write_buf {
+            Some(_) => self.write_command(command),
+            _ => todo!(),
+        }
     }
 
-    fn get_errors(self: &mut Self) -> ResultType {
-        // let command = mask_byte(CommandFlags::GET_POSITION as u8);
-        // return self.write_buf_command(command);
+    // #[allow(unused)]
+    fn get_position(self: &mut Self, channel: Channels) -> SliceResultType {
+        const RESPONSE_SIZE: usize = 2usize;
+        let command = mask_byte(CommandFlags::GET_POSITION as u8);
 
-        todo!();
+        return match self.write_buf {
+            Some(_) => match self.write_channel(command, channel) {
+                Ok(()) => match self.read(RESPONSE_SIZE) {
+                    Ok(bytes_read) => {
+                        match bytes_read == RESPONSE_SIZE {
+                            true => {
+                                let slice = &self.read_buf
+                                    .as_mut()
+                                    .unwrap()
+                                    .as_mut()[0usize..(bytes_read - 1usize)];
+
+                                Ok(slice)
+                            },
+                            _ => {
+                                let err_type = ErrorKind::ConnectionAborted;
+                                let err_msg = "maestro message could not be read_buf";
+
+                                Err(Error::new(err_type, err_msg))
+                            },
+                        }
+                    },
+                    Err(err) => Err(err),
+                },
+                Err(err) => Err(err),
+            },
+            _ => todo!(),
+        };
+    }
+
+    fn get_errors(self: &mut Self) -> SliceResultType {
+        const RESPONSE_SIZE: usize = 2usize;
+        let command = mask_byte(CommandFlags::GET_POSITION as u8);
+
+        return match self.write_buf {
+            Some(_) => match self.write_command(command) {
+                Ok(()) => match self.read(RESPONSE_SIZE) {
+                    Ok(bytes_read) => {
+                        match bytes_read == RESPONSE_SIZE {
+                            true => {
+                                let slice = &self.read_buf
+                                    .as_mut()
+                                    .unwrap()
+                                    .as_mut()[0usize..(bytes_read - 1usize)];
+
+                                Ok(slice)
+                            },
+                            _ => {
+                                let err_type = ErrorKind::ConnectionAborted;
+                                let err_msg = "maestro message could not be read_buf";
+
+                                Err(Error::new(err_type, err_msg))
+                            },
+                        }
+                    },
+                    Err(err) => Err(err),
+                },
+                Err(err) => Err(err),
+            },
+            _ => todo!(),
+        };
     }
 }
