@@ -1,5 +1,3 @@
-/* external crates */
-
 /* external uses */
 
 /* internal mods */

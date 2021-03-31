@@ -7,6 +7,7 @@ pub mod maestro_commands;
 pub mod maestro;
 pub mod maestro_constants;
 mod utils;
+pub mod prelude;
 
 /* internal uses */
 
