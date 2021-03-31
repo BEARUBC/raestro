@@ -125,48 +125,6 @@ impl Maestro {
 
         return self.write(6usize)
             .map(|_| ());
-
-        // let buffer_size = 6usize;
-
-        // let buffer: [u8; 6usize] = [
-        //     ProtocolMetadata::SYNC as u8,
-        //     ProtocolMetadata::DEVICE_NUMBER as u8,
-        //     command,
-        //     channel as u8,
-        //     payload_0,
-        //     payload_1,
-        // ];
-
-        // return match self.write_buf(&buffer) {
-        //     Ok(bytes_written) => match bytes_written == buffer_size {
-        //         true => Ok(()),
-        //         _ => {
-        //             let err_type = ErrorKind::ConnectionAborted;
-        //             let err_msg = "maestro protocol could not be sent";
-
-        //             Err(Error::new(err_type, err_msg))
-        //         },
-        //     },
-        //     Err(err) => Err(err),
-        // };
-
-        // return match &mut self.write_buf {
-        //     Some(buffer) => {
-        //         buffer[2usize] = command;
-        //         buffer[3usize] = channel as u8;
-        //         buffer[4usize] = lower;
-        //         buffer[5usize] = upper;
-
-        //         return self.write(6usize)
-        //             .map(|_| ());
-        //     },
-        //     _ => {
-        //         let err_type = ErrorKind::NotConnected;
-        //         let err_msg = "Maestro not initialized. Consider calling .start()";
-
-        //         Err(Error::new(err_type, err_msg))
-        //     },
-        // };
     }
 
     #[inline]
@@ -260,7 +218,6 @@ impl MaestroCommands for Maestro {
         }
     }
 
-    // #[allow(unused)]
     fn get_position(self: &mut Self, channel: Channels) -> SliceResultType {
         const RESPONSE_SIZE: usize = 2usize;
         let command = mask_byte(CommandFlags::GET_POSITION as u8);
