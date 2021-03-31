@@ -162,7 +162,7 @@ impl Maestro {
                 GpioError::PinNotAvailable(pin) => Error::new(ErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin)),
                 GpioError::PermissionDenied(err_string) => Error::new(ErrorKind::PermissionDenied, format!("permission denied: {} ", err_string)),
                 GpioError::Io(error) => error,
-                GpioError::ThreadPanic => Error::new(ErrorKind::Other, "thread_buf panic"),
+                GpioError::ThreadPanic => Error::new(ErrorKind::Other, "thread panic"),
             },
             UartError::InvalidValue => Error::new(ErrorKind::Other, "invalid value"),
         };
