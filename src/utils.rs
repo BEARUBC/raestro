@@ -23,7 +23,12 @@ pub(crate) fn microsec_to_target(mut microsec: u16) -> (u8, u8) {
 }
 
 #[cfg(test)]
-mod util_tests {
+mod tests {
+    /* external uses */
+
+    /* internal mods */
+
+    /* internal uses */
     use super::*;
 
     #[test]

@@ -12,9 +12,7 @@ pub mod prelude;
 /* internal uses */
 
 #[cfg(test)]
-mod lib_tests {
-    /* external crates */
-
+mod tests {
     /* external uses */
 
     /* internal mods */
