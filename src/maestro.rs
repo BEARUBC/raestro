@@ -21,6 +21,10 @@ use crate::utils::*;
 use crate::maestro_constants::*;
 use crate::maestro_commands::*;
 
+const DATA_BITS: u8 = 8u8;
+const STOP_BITS: u8 = 1u8;
+const BUFFER_SIZE: usize = 6usize;
+
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; 6usize]>>,
@@ -37,10 +41,6 @@ impl Maestro {
     }
 
     pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<(), Error> {
-        const DATA_BITS: u8 = 8u8;
-        const STOP_BITS: u8 = 1u8;
-        const BUFFER_SIZE: usize = 6usize;
-
         let uart_result: RppalResult<Uart> = Uart::new(
             baud_rate as u32,
             Parity::None,
@@ -76,7 +76,7 @@ impl Maestro {
     }
 
     fn read(self: &mut Self, length: usize) -> Result<usize, Error> {
-        if length <= 2usize {
+        if (length <= 2usize) || (BUFFER_SIZE < length) {
             panic!();
         }
         
@@ -91,7 +91,7 @@ impl Maestro {
     }
 
     fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
-        if length <= 2usize {
+        if (length <= 2usize) || (BUFFER_SIZE < length)  {
             panic!();
         }
 
