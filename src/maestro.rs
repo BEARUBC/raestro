@@ -280,7 +280,7 @@ impl MaestroCommands for Maestro {
                             },
                             _ => {
                                 let err_type = ErrorKind::ConnectionAborted;
-                                let err_msg = "maestro message could not be read_buf";
+                                let err_msg = "maestro message could not be read";
 
                                 Err(Error::new(err_type, err_msg))
                             },
@@ -313,7 +313,7 @@ impl MaestroCommands for Maestro {
                             },
                             _ => {
                                 let err_type = ErrorKind::ConnectionAborted;
-                                let err_msg = "maestro message could not be read_buf";
+                                let err_msg = "maestro message could not be read";
 
                                 Err(Error::new(err_type, err_msg))
                             },
