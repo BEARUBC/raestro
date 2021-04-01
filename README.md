@@ -16,6 +16,12 @@ In order to configure UART for the Raspberry Pi, do the following:
 If "cargo build" or "cargo test" do not work because of the rppal dependency, check the rppal documentations on how to set up UART.
 The link is [here][1].
 
+## Set-Up
+1. Connect the power+ground lines from the RPi to the Maestro.
+2. Connect the RPI's TX and RX pins to the Maestro's RX and TX pins, respectively. Please note the order in which the pins need to be connected (RPi TX connected to Maestro RX; RPi RX connected to Maestro TX).
+3. Connect the power lines for the servos (holding the board such that the pins are facing you and are on the right side of the board,these are the 2 pins on the top right). The left one of the pair is the power; the right one is ground.
+4. Connect up to 6 servos on one of the pin-triples available (the backside of the board has more info on each pin-type).
+
 ## Usage
 In order to send commands to the Micro Maestro:
 1. Create a new Maestro struct instance.
