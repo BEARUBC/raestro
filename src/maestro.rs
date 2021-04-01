@@ -83,7 +83,7 @@ impl Maestro {
         let slice = &mut self.read_buf
             .as_mut()
             .unwrap()
-            .as_mut()[0usize..(length - 1usize)];
+            .as_mut()[0usize..length];
 
         return self.uart.as_mut().unwrap().read(slice)
             .map(|bytes_written| bytes_written)
@@ -98,7 +98,7 @@ impl Maestro {
         let slice = &self.write_buf
             .as_mut()
             .unwrap()
-            .as_mut()[0usize..(length - 1usize)];
+            .as_mut()[0usize..length];
 
         return self.uart.as_mut().unwrap().write(slice)
             .map(|bytes_written| bytes_written)
