@@ -243,9 +243,9 @@ impl Maestro {
         let buf = self.read_buf
             .as_mut()
             .unwrap()
-            .as_mut()[0usize..2usize];
+            .as_mut();
 
-        let data: u16 = (buf[1usize] << 8usize) | buf[0usize];
+        let data: u16 = ((buf[1usize] as u16) << 8usize) | (buf[0usize] as u16);
 
         return data;
     }
@@ -257,10 +257,6 @@ impl Maestro {
             .and_then(|()| self.read(RESPONSE_SIZE))
             .and_then(move |bytes_read| {
                 return if bytes_read == RESPONSE_SIZE {
-                    // let slice = &self.read_buf
-                    //     .as_mut()
-                    //     .unwrap()
-                    //     .as_mut()[0usize..bytes_read];
                         Ok(self.prepare_data_from_buffer())
                 } else {
                     let err_type = ErrorKind::ConnectionAborted;
