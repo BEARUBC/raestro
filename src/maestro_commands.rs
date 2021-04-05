@@ -7,7 +7,7 @@ use std::io::Error;
 use crate::maestro_constants::Channels;
 
 pub type UnitResultType = Result<(), Error>;
-pub type SliceResultType<'a> = Result<&'a [u8], Error>;
+pub type DataResultType<'a> = Result<u16, Error>;
 
 pub trait MaestroCommands {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType;
@@ -17,6 +17,6 @@ pub trait MaestroCommands {
     fn go_home(self: &mut Self) -> UnitResultType;
     fn stop_script(self: &mut Self) -> UnitResultType;
 
-    fn get_position(self: &mut Self, channel: Channels) -> SliceResultType;
-    fn get_errors(self: &mut Self) -> SliceResultType;
+    fn get_position(self: &mut Self, channel: Channels) -> DataResultType;
+    fn get_errors(self: &mut Self) -> DataResultType;
 }

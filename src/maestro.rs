@@ -85,10 +85,6 @@ impl Maestro {
         self.write_buf = None;
     }
 
-    pub fn read_buffer(self: &Self) -> Option<Box<[u8; 6usize]>> {
-        return self.read_buf.clone();
-    }
-
     pub fn set_block_duration(self: &mut Self, duration: Duration) -> Result<(), Error> {
         return self.uart
             .as_mut()
@@ -243,19 +239,29 @@ impl Maestro {
         };
     }
 
-    fn read_after_writing(self: &mut Self, write_result: UnitResultType) -> SliceResultType {
+    fn prepare_data_from_buffer(self: &mut Self) -> u16 {
+        let buf = self.read_buf
+            .as_mut()
+            .unwrap()
+            .as_mut()[0usize..2usize];
+
+        let data: u16 = (buf[1usize] << 8usize) | buf[0usize];
+
+        return data;
+    }
+
+    fn read_after_writing(self: &mut Self, write_result: UnitResultType) -> DataResultType {
         const RESPONSE_SIZE: usize = 2usize;
 
         return write_result
             .and_then(|()| self.read(RESPONSE_SIZE))
             .and_then(move |bytes_read| {
                 return if bytes_read == RESPONSE_SIZE {
-                    let slice = &self.read_buf
-                        .as_mut()
-                        .unwrap()
-                        .as_mut()[0usize..bytes_read];
-
-                        Ok(slice)
+                    // let slice = &self.read_buf
+                    //     .as_mut()
+                    //     .unwrap()
+                    //     .as_mut()[0usize..bytes_read];
+                        Ok(self.prepare_data_from_buffer())
                 } else {
                     let err_type = ErrorKind::ConnectionAborted;
                     let err_msg = "maestro message could not be read";
@@ -287,13 +293,13 @@ impl MaestroCommands for Maestro {
         return self.write_command(CommandFlags::STOP_SCRIPT);
     }
 
-    fn get_position(self: &mut Self, channel: Channels) -> SliceResultType {
+    fn get_position(self: &mut Self, channel: Channels) -> DataResultType {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
         return self.read_after_writing(write_result);
     }
 
-    fn get_errors(self: &mut Self) -> SliceResultType {
+    fn get_errors(self: &mut Self) -> DataResultType {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
         return self.read_after_writing(write_result);
