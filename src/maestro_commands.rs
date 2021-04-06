@@ -7,7 +7,7 @@ use std::io::Error;
 use crate::maestro_constants::Channels;
 
 pub type UnitResultType = Result<(), Error>;
-pub type DataResultType<'a> = Result<u16, Error>;
+pub type DataResultType = Result<u16, Error>;
 
 pub trait MaestroCommands {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType;
