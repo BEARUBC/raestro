@@ -23,6 +23,7 @@ pub struct Maestro {
 }
 
 impl Maestro {
+    /// test doc
     pub fn new() -> Self {
         return Maestro {
             uart: None,
