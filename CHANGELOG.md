@@ -1,4 +1,4 @@
-# v0.2.0
+# v0.2.0.
 ## Changes:
 ### 04/13/21
 * improved API design:
