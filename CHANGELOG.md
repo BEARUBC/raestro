@@ -1,4 +1,4 @@
-# v0.0.2
+# v0.2.0
 ## Changes:
 * improved API design:
 	* relocated read/write buffers in Maestro struct instead of localized buffers in each API
