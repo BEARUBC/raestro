@@ -64,6 +64,6 @@ fn main() -> () {
 
 	let actual_position = maestro.get_position(channel).unwrap();
 	
-	assert!(position, actual_position);
+	assert_eq!(position, actual_position);
 }
 ```
