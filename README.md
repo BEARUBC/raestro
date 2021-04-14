@@ -2,7 +2,7 @@
 [![crates.io](https://meritbadge.herokuapp.com/raestro)](https://crates.io/crates/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
-Written and developed by UBC Bionics, Ltd., a design team based in the University of British Columbia, Vancouver.
+Written and developed by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver.
 
 ## Table of Contents
 - [Documentation](#Documentation)
