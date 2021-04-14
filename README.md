@@ -1,8 +1,10 @@
-# Raestro - A Rust-flavoured 6-Channel Pololu Micro Maestro API Interface
+# Raestro
 [![crates.io](https://meritbadge.herokuapp.com/raestro)](https://crates.io/crates/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
-Written and developed by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver.
+Raestro is a Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board. This library is developed specifically for the Raspberry Pi, which acts as the main computer system on our bionic arm.
+
+Raestro is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver.
 
 ## Table of Contents
 - [Documentation](#Documentation)
