@@ -35,13 +35,13 @@ If "cargo build" or "cargo test" do not work because of the rppal dependency, ch
 The link is [here](https://docs.rs/rppal/0.11.3/rppal/uart/index.html).
 
 ## Usage
-In order to send commands to the Micro Maestro:
-1. Create a new Maestro struct instance.
-2. Initialize the instance by:
-	* Calling the start method with a baudrate.
-	* Matching off of the std::result::Result returned (or just unwrapping).
-3. Call one of the methods listed in the MaestroCommands trait with the appropriate arguments.
-	* The 6-Channel Micro Maestro is able to service 6 servo motors. A channel can be selected through the Channels enum.
+Add the following to your Cargo.toml file:
+```toml
+[dependencies]
+raestro = "0.2.0"
+```
+In the main function, create a new Maestro instance and initialize it by calling start.
+This initialized struct can now be utilized to perform writes and reads to and from the Maestro.
 ```rust
 use raestro::prelude::*;
 
