@@ -1,12 +1,12 @@
 [package]
 name = "raestro"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.com>", "KelvinKCLee <leekachunkelvin@gmail.com>", "bzhou64 <billzhou64@gmail.com>", "panchalmaharshi8 <panchalmaharshi8@gmail.com>"]
 edition = "2018"
 license = "MIT"
-description = "A rust-flavoured library providing APIs to interface with the 6-Channel Pololu Micro Maestro. Only able to be compiled on the Raspberry Pi due to rppal dependency."
-repository = "https://github.com/nathan-n-poon/PololuRust"
-keywords = ["Pololu", "Maestro", "6-channel", "servo"]
+description = "A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board. Developed for the Raspberry Pi"
+repository = "https://github.com/raunakab/raestro"
+keywords = ["pololu", "maestro", "6-channel", "servo-controller", "raspberry-pi"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
