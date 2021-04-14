@@ -16,6 +16,8 @@ fn main() -> () {
     // this is the maximum range, apparently...?
     //      (i.e., 3968 - 8000)
     //      (which is equal to 992us - 2000us)
+    //      (most servos operate in this microsecond range,
+    //      with some minor overextensions)
     let positions: [u16; 2usize] = [3968u16, 8000u16];
     let sleep_time: u64 = 1000u64;
 
