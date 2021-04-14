@@ -1,5 +1,3 @@
-/* external crates */
-
 /* external uses */
 
 /* internal mods */
@@ -8,14 +6,15 @@
 
 #[allow(non_camel_case_types)]
 #[repr(u8)]
-pub(crate) enum ProtocolMetaData {
+pub(crate) enum ProtocolMetadata {
     SYNC = 0xaau8,
     DEVICE_NUMBER = 0x0cu8,
 }
 
 #[allow(non_camel_case_types, unused)]
 #[repr(u8)]
-pub(crate) enum Commands {
+#[derive(Clone)]
+pub(crate) enum CommandFlags {
     SET_TARGET = 0x84u8,
     SET_SPEED = 0x87u8,
     SET_ACCELERATION = 0x89u8,
@@ -44,4 +43,18 @@ pub enum Channels {
 pub enum BaudRates {
     BR_50 = 50u32,
     BR_115200 = 115200u32,
+}
+
+#[allow(non_camel_case_types)]
+#[repr(u16)]
+pub enum Errors {
+    SER_SIGNAL_ERR = 0u16,
+    SER_OVERRUN_ERR = 1u16,
+    SER_BUFFER_FULL = 2u16,
+    SER_CRC_ERR = 3u16,
+    SER_PROTOCOL_ERR = 4u16,
+    SER_TIMEOUT = 5u16,
+    SCRIPT_STACK_ERR = 6u16,
+    SCRIPT_CALL_STACK_ERR = 7u16,
+    SCRIPT_PC_ERR = 8u16,
 }

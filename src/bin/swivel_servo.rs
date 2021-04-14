@@ -1,23 +1,29 @@
+/* external crates */
+
+/* external uses */
 use std::thread;
 use std::time::Duration;
+use raestro::prelude::*;
 
-use raestro::maestro::*;
-use raestro::maestro_commands::MaestroCommands;
-use raestro::maestro_constants::*;
+/* internal mods */
+
+/* internal uses */
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    let small: u16 = 500u16;
-    let big: u16 = 60000u16;
-    let sleep_time: u64 = 1000u64;
+    let mut position = 5_000u16;
+    let sleep_time: u64 = 200u64;
 
     loop {
-        maestro.set_target(Channels::C_0, small).unwrap();
+        println!("{}", position);
+        maestro.set_target(Channels::C_0, position).unwrap();
         thread::sleep(Duration::from_millis(sleep_time));
 
-        maestro.set_target(Channels::C_0, big).unwrap();
-        thread::sleep(Duration::from_millis(sleep_time));
+        position += 100u16;
+        if position == 8_000u16 {
+            position = 5_000u16;
+        }
     }
 }

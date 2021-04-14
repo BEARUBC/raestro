@@ -1,16 +1,22 @@
-/* external crates */
-
 /* external uses */
-use rppal::uart::Error;
+use std::io::Error;
 
 /* internal mods */
 
 /* internal uses */
 use crate::maestro_constants::Channels;
 
+pub type UnitResultType = Result<(), Error>;
+pub type DataResultType = Result<u16, Error>;
+
 pub trait MaestroCommands {
-    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error>;
-    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> std::result::Result<usize, Error>;
-    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> std::result::Result<usize, Error>;
-    fn get_position(self: &mut Self, channel: Channels) -> std::result::Result<usize, Error>;
+    fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType;
+    fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType;
+    fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> UnitResultType;
+
+    fn go_home(self: &mut Self) -> UnitResultType;
+    fn stop_script(self: &mut Self) -> UnitResultType;
+
+    fn get_position(self: &mut Self, channel: Channels) -> DataResultType;
+    fn get_errors(self: &mut Self) -> DataResultType;
 }
