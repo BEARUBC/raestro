@@ -7,6 +7,7 @@ license = "MIT"
 description = "A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board. Developed for the Raspberry Pi"
 repository = "https://github.com/raunakab/raestro"
 keywords = ["pololu", "maestro", "6-channel", "servo-controller", "raspberry-pi"]
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
