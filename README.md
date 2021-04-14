@@ -39,6 +39,23 @@ In order to send commands to the Micro Maestro:
 1. Create a new Maestro struct instance.
 2. Initialize the instance by:
 	* Calling the start method with a baudrate.
-	* Matching off of the std::result::Result returned.
+	* Matching off of the std::result::Result returned (or just unwrapping).
 3. Call one of the methods listed in the MaestroCommands trait with the appropriate arguments.
-	* The 6-Channel Micro Maestro is able to service 6 servo motors. A channel can be selected through the rustro::maestro_constants::Channels enum.
+	* The 6-Channel Micro Maestro is able to service 6 servo motors. A channel can be selected through the Channels enum.
+```rust
+use raestro::prelude::*;
+
+fn main() -> () {
+	let mut maestro: Maestro = Maestro::new();
+	maestro.start(BaudRates::BR_115200).unwrap();
+    
+	let channel = Channels::C_0;
+	let position = 5_000u16;
+
+	maestro.set_target(channel, position).unwrap();
+
+	let actual_position = maestro.get_position(channel).unwrap();
+	
+	assert!(position, actual_position);
+}
+```
