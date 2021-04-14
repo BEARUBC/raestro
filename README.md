@@ -13,7 +13,7 @@ Written and developed by UBC Bionics, Ltd., a design team based in the Universit
 - [Usage](#Usage)
 
 ## Documentation
-As of current, documentation for this library and all of its APIs is still being written. However, design decisions on Raestro are now starting to stabilize, and as such, documentation will soon be available.
+As of current, documentation for this library and all of its APIs is still being worked on. However, design decisions on Raestro are now finally starting to stabilize, and as such, documentation will soon be available as part of the next incremental release.
 
 ## Getting Started
 
