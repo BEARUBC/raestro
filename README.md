@@ -5,11 +5,15 @@
 Written and developed by UBC Bionics, Ltd., a design team based in the University of British Columbia, Vancouver.
 
 ## Table of Contents
+- [Documentation](#Documentation)
 - [Getting Started](#Getting-Started)
 	- [Hardware Setup](#Hardware-Setup)
 	- [Software Setup](#Software-Setup)
 	- [Trouble-Shooting](#Trouble-Shooting)
 - [Usage](#Usage)
+
+## Documentation
+As of current, documentation for this library and all of its APIs is still being written. However, design decisions on Raestro are now starting to stabilize, and as such, documentation will soon be available.
 
 ## Getting Started
 
