@@ -285,13 +285,10 @@ impl MaestroCommands for Maestro {
                 Err(Error::new(err_type, err_msg))
             },
             _ => Ok(microsec),
-        };
-
-        return x;
-            // .and_then(|microsec| {
-            //     self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec)
-            // });
-        ;
+        }
+            .and_then(|microsec| {
+                self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec)
+            });
         // return self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec);
     }
 
