@@ -248,8 +248,6 @@ impl Maestro {
     }
 
     fn read_after_writing(self: &mut Self, write_result: UnitResultType) -> DataResultType {
-        const RESPONSE_SIZE: usize = 2usize;
-
         return write_result
             .and_then(|()| self.read(RESPONSE_SIZE))
             .and_then(move |bytes_read| {
