@@ -270,7 +270,29 @@ impl Maestro {
 
 impl MaestroCommands for Maestro {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
-        return self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec);
+        let (min, max): (u16, u16) = (992u16, 2000u16);
+        let x = match microsec {
+            _ if microsec < min => {
+                let err_type = ErrorKind::Other;
+                let err_msg = format!("microsec cannot be less than {}", min);
+
+                Err(Error::new(err_type, err_msg))
+            },
+            _ if microsec > max => {
+                let err_type = ErrorKind::Other;
+                let err_msg = format!("microsec cannot be greater than {}", max);
+
+                Err(Error::new(err_type, err_msg))
+            },
+            _ => Ok(microsec),
+        };
+
+        return x;
+            // .and_then(|microsec| {
+            //     self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec)
+            // });
+        ;
+        // return self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec);
     }
 
     fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
