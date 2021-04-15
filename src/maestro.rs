@@ -22,14 +22,12 @@ use crate::utils::*;
 use crate::maestro_constants::*;
 use crate::maestro_commands::*;
 
-const DATA_BITS: u8 = 8u8;
-const STOP_BITS: u8 = 1u8;
 const BUFFER_SIZE: usize = 6usize;
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
-    read_buf: Option<Box<[u8; 6usize]>>,
-    write_buf: Option<Box<[u8; 6usize]>>,
+    read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
+    write_buf: Option<Box<[u8; BUFFER_SIZE]>>,
 }
 
 impl Maestro {
@@ -54,8 +52,7 @@ impl Maestro {
         return uart_result
             .map_err(ERR_FUNC)
             .and_then(|uart| {
-                const RESPONSE_SIZE: u8 = 2u8;
-                const BLOCK_DURATION: u64 = 2u64;
+                let block_duration: u64 = 2u64;
 
                 self.uart = Some(Box::new(uart));
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
@@ -65,7 +62,7 @@ impl Maestro {
                     .as_mut()
                     .unwrap()
                     .as_mut()
-                    .set_read_mode(RESPONSE_SIZE, Duration::from_secs(BLOCK_DURATION))
+                    .set_read_mode(RESPONSE_SIZE, Duration::from_secs(block_duration))
                     .map_err(ERR_FUNC);
             })
             .map(|_| {
@@ -74,8 +71,8 @@ impl Maestro {
                     .unwrap()
                     .as_mut();
                 
-                buf[0usize] = ProtocolMetadata::SYNC as u8;
-                buf[1usize] = ProtocolMetadata::DEVICE_NUMBER as u8;
+                buf[0usize] = SYNC as u8;
+                buf[1usize] = DEVICE_NUMBER as u8;
             });
     }
 
@@ -117,7 +114,9 @@ impl Maestro {
     }
 
     fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
-        if (length <= 2usize) || (BUFFER_SIZE < length)  {
+        const MIN_WRITE_LENGTH: usize = 3usize;
+
+        if (length < MIN_WRITE_LENGTH) || (BUFFER_SIZE < length)  {
             panic!();
         }
 
@@ -251,12 +250,10 @@ impl Maestro {
     }
 
     fn read_after_writing(self: &mut Self, write_result: UnitResultType) -> DataResultType {
-        const RESPONSE_SIZE: usize = 2usize;
-
         return write_result
-            .and_then(|()| self.read(RESPONSE_SIZE))
+            .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .and_then(move |bytes_read| {
-                return if bytes_read == RESPONSE_SIZE {
+                return if bytes_read == (RESPONSE_SIZE as usize) {
                         Ok(self.prepare_data_from_buffer())
                 } else {
                     let err_type = ErrorKind::ConnectionAborted;
@@ -270,7 +267,22 @@ impl Maestro {
 
 impl MaestroCommands for Maestro {
     fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
-        return self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec);
+        return if microsec < MIN_PWM {
+            let err_type = ErrorKind::Other;
+            let err_msg = format!("microsec cannot be less than {}", MIN_PWM);
+
+            Err(Error::new(err_type, err_msg))
+        } else if microsec > MAX_PWM {
+            let err_type = ErrorKind::Other;
+            let err_msg = format!("microsec cannot be greater than {}", MAX_PWM);
+
+            Err(Error::new(err_type, err_msg))
+        } else {
+            Ok(microsec << DATA_MULTIPLIER)
+        }
+            .and_then(move |microsec| {
+                self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, microsec)
+            });
     }
 
     fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> UnitResultType {
@@ -292,7 +304,9 @@ impl MaestroCommands for Maestro {
     fn get_position(self: &mut Self, channel: Channels) -> DataResultType {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
-        return self.read_after_writing(write_result);
+        return self
+            .read_after_writing(write_result)
+            .map(move |result| result >> DATA_MULTIPLIER);
     }
 
     fn get_errors(self: &mut Self) -> DataResultType {

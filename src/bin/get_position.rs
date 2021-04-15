@@ -18,7 +18,7 @@ fn main() -> () {
     //      (which is equal to 992us - 2000us)
     //      (most servos operate in this microsecond range,
     //      with some minor overextensions)
-    let positions: [u16; 2usize] = [3968u16, 8000u16];
+    let positions: [u16; 2usize] = [992u16, 2000u16];
     let sleep_time: u64 = 1000u64;
 
     #[allow(unused_assignments)]
