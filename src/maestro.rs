@@ -114,7 +114,9 @@ impl Maestro {
     }
 
     fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
-        if (length <= 2usize) || (BUFFER_SIZE < length)  {
+        const MIN_WRITE_LENGTH: usize = 2usize;
+
+        if (length <= MIN_WRITE_LENGTH) || (BUFFER_SIZE < length)  {
             panic!();
         }
 
