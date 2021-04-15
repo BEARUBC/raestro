@@ -96,7 +96,7 @@ impl Maestro {
             .map(|_| ());
     }
 
-    fn read(self: &mut Self, length: usize) -> Result<usize, Error> {
+    fn read(self: &mut Self, length: u8) -> Result<usize, Error> {
         if BUFFER_SIZE < length {
             panic!();
         }
@@ -104,7 +104,7 @@ impl Maestro {
         let slice = &mut self.read_buf
             .as_mut()
             .unwrap()
-            .as_mut()[0usize..length];
+            .as_mut()[0usize..(length as usize)];
 
         return self.uart
             .as_mut()
