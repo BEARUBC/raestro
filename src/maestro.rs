@@ -96,7 +96,7 @@ impl Maestro {
             .map(|_| ());
     }
 
-    fn read(self: &mut Self, length: u8) -> Result<usize, Error> {
+    fn read(self: &mut Self, length: usize) -> Result<usize, Error> {
         if BUFFER_SIZE < length {
             panic!();
         }
@@ -104,7 +104,7 @@ impl Maestro {
         let slice = &mut self.read_buf
             .as_mut()
             .unwrap()
-            .as_mut()[0usize..(length as usize)];
+            .as_mut()[0usize..length];
 
         return self.uart
             .as_mut()
@@ -249,7 +249,7 @@ impl Maestro {
 
     fn read_after_writing(self: &mut Self, write_result: UnitResultType) -> DataResultType {
         return write_result
-            .and_then(|()| self.read(RESPONSE_SIZE))
+            .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .and_then(move |bytes_read| {
                 return if bytes_read == (RESPONSE_SIZE as usize) {
                         Ok(self.prepare_data_from_buffer())
