@@ -15,9 +15,6 @@ pub mod maestro;
 pub mod maestro_constants;
 mod utils;
 pub mod prelude;
-
-/* internal uses */
-
 #[cfg(test)]
 mod tests {
     /* external uses */
@@ -35,3 +32,5 @@ mod tests {
         maestro.close();
     }
 }
+
+/* internal uses */
