@@ -13,3 +13,4 @@
 
 ## Todo
 * finish documentation for all functions
+* add custom error type for raestro; as of current, std::io::Error is being used
