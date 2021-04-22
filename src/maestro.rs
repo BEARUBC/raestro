@@ -40,6 +40,7 @@ pub struct Maestro {
 
 // basic public APIs
 impl Maestro {
+    /// test doc
     pub fn new() -> Self {
         return Maestro {
             uart: None,
