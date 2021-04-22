@@ -1,3 +1,10 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or distributed
+// except according to those terms.
+
 /* external crates */
 
 /* external uses */
@@ -7,13 +14,9 @@ pub mod maestro_commands;
 pub mod maestro;
 pub mod maestro_constants;
 mod utils;
-
-/* internal uses */
-
+pub mod prelude;
 #[cfg(test)]
-mod lib_tests {
-    /* external crates */
-
+mod tests {
     /* external uses */
 
     /* internal mods */
@@ -29,3 +32,5 @@ mod lib_tests {
         maestro.close();
     }
 }
+
+/* internal uses */

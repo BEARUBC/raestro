@@ -1,9 +1,20 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or distributed
+// except according to those terms.
+
+/* external crates */
+
+/* external uses */
 use std::thread;
 use std::time::Duration;
+use raestro::prelude::*;
 
-use raestro::maestro::*;
-use raestro::maestro_commands::MaestroCommands;
-use raestro::maestro_constants::*;
+/* internal mods */
+
+/* internal uses */
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
