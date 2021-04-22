@@ -15,14 +15,15 @@ pub const SYNC: u8 = 0xaau8;
 pub const DEVICE_NUMBER: u8 = 0x0cu8;
 pub const DATA_BITS: u8 = 8u8;
 pub const STOP_BITS: u8 = 1u8;
+pub const MIN_WRITE_LENGTH: usize = 3usize;
 pub const RESPONSE_SIZE: u8 = 2u8;
 pub const MIN_PWM: u16 = 0992u16;
 pub const MAX_PWM: u16 = 2000u16;
 pub const DATA_MULTIPLIER: usize = 2usize;
 
 #[allow(non_camel_case_types, unused)]
+#[derive(Copy, Clone)]
 #[repr(u8)]
-#[derive(Clone)]
 pub(crate) enum CommandFlags {
     SET_TARGET = 0x84u8,
     SET_SPEED = 0x87u8,
@@ -37,6 +38,7 @@ pub(crate) enum CommandFlags {
 }
 
 #[allow(non_camel_case_types)]
+#[derive(Copy, Clone)]
 #[repr(u8)]
 pub enum Channels {
     C_0 = 0x0u8,
@@ -48,6 +50,7 @@ pub enum Channels {
 }
 
 #[allow(non_camel_case_types)]
+#[derive(Copy, Clone)]
 #[repr(u32)]
 pub enum BaudRates {
     BR_50 = 50u32,
@@ -55,6 +58,7 @@ pub enum BaudRates {
 }
 
 #[allow(non_camel_case_types)]
+#[derive(Copy, Clone)]
 #[repr(u16)]
 pub enum Errors {
     SER_SIGNAL_ERR = 0u16,
