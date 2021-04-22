@@ -10,9 +10,9 @@
 /* external uses */
 
 /* internal mods */
-pub mod maestro_commands;
+pub mod commands;
+pub mod constants;
 pub mod maestro;
-pub mod maestro_constants;
 mod utils;
 pub mod prelude;
 #[cfg(test)]

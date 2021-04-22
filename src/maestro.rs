@@ -26,8 +26,8 @@ use rppal::{
 
 /* internal uses */
 use crate::utils::*;
-use crate::maestro_constants::*;
-use crate::maestro_commands::*;
+use crate::constants::*;
+use crate::commands::*;
 
 const BUFFER_SIZE: usize = 6usize;
 
