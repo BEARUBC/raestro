@@ -1,3 +1,10 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or distributed
+// except according to those terms.
+
 /* external crates */
 
 /* external uses */
@@ -18,7 +25,7 @@ fn main() -> () {
     //      (which is equal to 992us - 2000us)
     //      (most servos operate in this microsecond range,
     //      with some minor overextensions)
-    let positions: [u16; 2usize] = [3968u16, 8000u16];
+    let positions: [u16; 2usize] = [992u16, 2000u16];
     let sleep_time: u64 = 1000u64;
 
     #[allow(unused_assignments)]

@@ -1,5 +1,10 @@
 # v0.2.0
+
 ## Changes:
+
+### 04/17/21
+* added legal copyright notations to the top of every source code file
+
 ### 04/13/21
 * improved API design:
 	* relocated read/write buffers in Maestro struct instead of localized buffers in each API
@@ -8,3 +13,4 @@
 
 ## Todo
 * finish documentation for all functions
+* add custom error type for raestro; as of current, std::io::Error is being used

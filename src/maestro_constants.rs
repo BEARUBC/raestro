@@ -1,15 +1,24 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or distributed
+// except according to those terms.
+
 /* external uses */
 
 /* internal mods */
 
 /* internal uses */
 
-#[allow(non_camel_case_types)]
-#[repr(u8)]
-pub(crate) enum ProtocolMetadata {
-    SYNC = 0xaau8,
-    DEVICE_NUMBER = 0x0cu8,
-}
+pub const SYNC: u8 = 0xaau8;
+pub const DEVICE_NUMBER: u8 = 0x0cu8;
+pub const DATA_BITS: u8 = 8u8;
+pub const STOP_BITS: u8 = 1u8;
+pub const RESPONSE_SIZE: u8 = 2u8;
+pub const MIN_PWM: u16 = 0992u16;
+pub const MAX_PWM: u16 = 2000u16;
+pub const DATA_MULTIPLIER: usize = 2usize;
 
 #[allow(non_camel_case_types, unused)]
 #[repr(u8)]

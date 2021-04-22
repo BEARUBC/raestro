@@ -1,5 +1,6 @@
 # Raestro - A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board
 [![crates.io](https://meritbadge.herokuapp.com/raestro)](https://crates.io/crates/raestro)
+[![docs](https://docs.rs/raestro/badge.svg)](https://docs.rs/crate/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 Raestro is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
@@ -64,6 +65,6 @@ fn main() -> () {
 
 	let actual_position = maestro.get_position(channel).unwrap();
 	
-	assert!(position, actual_position);
+	assert_eq!(position, actual_position);
 }
 ```
