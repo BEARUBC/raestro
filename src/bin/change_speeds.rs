@@ -22,23 +22,23 @@ fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    let slow: u16 = 10u16;
-    let fast: u16 = 140u16;
+    let channel: Channels = Channels::C_0;
 
-    let small: u16 = 500u16;
-    let big: u16 = 60000u16;
+    let accel0 = 10u16;
+    let accel1 = 140u16;
 
-    let sleep_time: u64 = 1000u64;
+    let pos0 = 992u16;
+    let pos1 = 2000u16;
+
+    let sleep_time = Duration::from_millis(1000u64);
 
     loop {
-        maestro.set_speed(Channels::C_0, slow).unwrap();
-        maestro.set_target(Channels::C_0, small).unwrap();
+        maestro.set_speed(channel, accel0).unwrap();
+        maestro.set_target(channel, pos0).unwrap();
+        thread::sleep(sleep_time);
 
-        thread::sleep(Duration::from_millis(sleep_time));
-
-        maestro.set_speed(Channels::C_0, fast).unwrap();
-        maestro.set_target(Channels::C_0, big).unwrap();
-
-        thread::sleep(Duration::from_millis(sleep_time));
+        maestro.set_speed(channel, accel1).unwrap();
+        maestro.set_target(channel, pos1).unwrap();
+        thread::sleep(sleep_time);
     }
 }
