@@ -8,8 +8,10 @@
 /* external crates */
 
 /* external uses */
-use std::thread;
-use std::time::Duration;
+use std::{
+    thread,
+    time::Duration,
+};
 use raestro::prelude::*;
 
 /* internal mods */
@@ -20,11 +22,12 @@ fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    // this is the maximum range, apparently...?
-    //      (i.e., 3968 - 8000)
-    //      (which is equal to 992us - 2000us)
+    // this is the maximum range:
+    //      992us - 2000us
     //      (most servos operate in this microsecond range,
     //      with some minor overextensions)
+    //      (the Maestro accepts microsecond multiplied by 4,
+    //      thus the range is 3968 - 8000)
     let positions: [u16; 2usize] = [992u16, 2000u16];
     let sleep_time: u64 = 1000u64;
 

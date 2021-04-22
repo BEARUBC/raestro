@@ -8,24 +8,6 @@
 /* external uses */
 
 /* internal mods */
-
-/* internal uses */
-
-#[inline]
-pub(crate) fn mask_byte(byte: u8) -> u8 {
-    let top_mask: u8 = 0x7fu8;
-    return byte & top_mask;
-}
-
-pub(crate) fn microsec_to_target(microsec: u16) -> (u8, u8) {
-    let down_shift = 7usize;
-
-    let lower = mask_byte(microsec as u8);
-    let upper = mask_byte((microsec >> down_shift) as u8);
-
-    return (lower, upper);
-}
-
 #[cfg(test)]
 mod tests {
     /* external uses */
@@ -66,4 +48,21 @@ mod tests {
 
         assert_eq!(microsec_to_target(target), expected);
     }
+}
+
+/* internal uses */
+
+#[inline]
+pub(crate) fn mask_byte(byte: u8) -> u8 {
+    let top_mask: u8 = 0x7fu8;
+    return byte & top_mask;
+}
+
+pub(crate) fn microsec_to_target(microsec: u16) -> (u8, u8) {
+    let down_shift = 7usize;
+
+    let lower = mask_byte(microsec as u8);
+    let upper = mask_byte((microsec >> down_shift) as u8);
+
+    return (lower, upper);
 }

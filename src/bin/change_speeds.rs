@@ -8,8 +8,10 @@
 /* external crates */
 
 /* external uses */
-use std::thread;
-use std::time::Duration;
+use std::{
+    thread,
+    time::Duration,
+};
 use raestro::prelude::*;
 
 /* internal mods */
@@ -22,8 +24,10 @@ fn main() -> () {
 
     let slow: u16 = 10u16;
     let fast: u16 = 140u16;
+
     let small: u16 = 500u16;
     let big: u16 = 60000u16;
+
     let sleep_time: u64 = 1000u64;
 
     loop {
