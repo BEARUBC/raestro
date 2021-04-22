@@ -22,19 +22,25 @@ fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    let positions: [u16; 2usize] = [992u16, 2000u16];
-    let sleep_time: u64 = 1000u64;
+    let channel: Channels = Channels::C_0;
+
+    let pos_min = 992u16;
+    let pos_max = 2000u16;
+
+    let sleep_time = Duration::from_millis(1000u64);
 
     #[allow(unused_assignments)]
-    let mut arr: Option<u16> = None;
+    let mut current_position: Option<u16> = None;
 
     loop {
-        for (index, position) in positions.iter().enumerate() {
-	        maestro.set_target(Channels::C_0, *position).unwrap();
-	        arr = Some(maestro.get_position(Channels::C_0).unwrap());
-	
-	        println!("position_{}: {:?}", index, arr.unwrap());
-	        thread::sleep(Duration::from_millis(sleep_time));
-        }
+        maestro.set_target(channel, pos_min).unwrap();
+        current_position = Some(maestro.get_position(channel).unwrap());
+        println!("current position: {:?}", current_position.unwrap());
+        thread::sleep(sleep_time);
+
+        maestro.set_target(channel, pos_max).unwrap();
+        current_position = Some(maestro.get_position(channel).unwrap());
+        println!("current position: {:?}", current_position.unwrap());
+        thread::sleep(sleep_time);
     }
 }

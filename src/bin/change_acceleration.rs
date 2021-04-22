@@ -30,7 +30,7 @@ fn main() -> () {
     let pos0 = 992u16;
     let pos1 = 2000u16;
 
-    let sleep_time = Duration::from_millis(10000u64);
+    let sleep_time = Duration::from_millis(5000u64);
 
     loop {
         maestro.set_acceleration(channel, accel0).unwrap();
