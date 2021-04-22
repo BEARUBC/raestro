@@ -62,7 +62,7 @@ fn main() -> () {
 
 	// the position is in microseconds and can only be between 992 and 2000
 	// (specifically for the Pololu Micro-Maestro 6-Channel Board)
-	let position = 5_000u16;
+	let position = 992u16;
 
 	maestro.set_target(channel, position).unwrap();
 
@@ -71,3 +71,4 @@ fn main() -> () {
 	assert_eq!(position, actual_position);
 }
 ```
+More examples of API usage are provided in the src/bin folder.
