@@ -59,7 +59,7 @@ fn main() -> () {
 	maestro.start(BaudRates::BR_115200).unwrap();
     
 	let channel = Channels::C_0;
-	let position = 5_000u16;
+	let position = 992u16;
 
 	maestro.set_target(channel, position).unwrap();
 
