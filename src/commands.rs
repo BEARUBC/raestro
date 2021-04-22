@@ -11,7 +11,7 @@ use std::io::Error;
 /* internal mods */
 
 /* internal uses */
-use crate::maestro_constants::Channels;
+use crate::constants::Channels;
 
 pub type UnitResultType = Result<(), Error>;
 pub type DataResultType = Result<u16, Error>;
