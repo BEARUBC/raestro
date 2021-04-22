@@ -13,8 +13,9 @@
 pub mod commands;
 pub mod constants;
 pub mod maestro;
-mod utils;
 pub mod prelude;
+pub mod errors;
+mod utils;
 #[cfg(test)]
 mod tests {
     /* external uses */
