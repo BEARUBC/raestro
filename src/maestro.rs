@@ -28,9 +28,9 @@ use crate::{
     errors::*,
 };
 
-const BUFFER_SIZE: usize = 6usize;
-
 pub type Result<T> = StdResult<T, Error>;
+
+const BUFFER_SIZE: usize = 6usize;
 
 pub struct Maestro {
     uart: Option<Box<Uart>>,
@@ -38,6 +38,7 @@ pub struct Maestro {
     write_buf: Option<Box<[u8; BUFFER_SIZE]>>,
 }
 
+// basic public APIs
 impl Maestro {
     pub fn new() -> Self {
         return Maestro {
@@ -99,7 +100,54 @@ impl Maestro {
                     .map_err(|rppal_err| Error::from(rppal_err));
             });
     }
+}
 
+// public maestro commands
+impl Maestro {
+    pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
+        return if MIN_PWM < microsec && microsec < MAX_PWM {
+            Ok(microsec << DATA_MULTIPLIER)
+        } else {
+            Err(Error::InvalidValue(microsec))
+        }
+            .and_then(move |payload| {
+                self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, payload)
+            });
+    }
+
+    pub fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
+        return self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, microsec);
+    }
+
+    pub fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<()> {
+        return self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, value as u16);
+    }
+
+    pub fn go_home(self: &mut Self) -> Result<()> {
+        return self.write_command(CommandFlags::GO_HOME);
+    }
+
+    pub fn stop_script(self: &mut Self) -> Result<()> {
+        return self.write_command(CommandFlags::STOP_SCRIPT);
+    }
+
+    pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
+        let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
+
+        return self
+            .read_after_writing(write_result)
+            .map(move |result| result >> DATA_MULTIPLIER);
+    }
+
+    pub fn get_errors(self: &mut Self) -> Result<u16> {
+        let write_result = self.write_command(CommandFlags::GET_ERRORS);
+
+        return self.read_after_writing(write_result);
+    }
+}
+
+// private utility methods
+impl Maestro {
     fn read(self: &mut Self, length: usize) -> Result<()> {
         if BUFFER_SIZE < length {
             panic!();
@@ -234,46 +282,5 @@ impl Maestro {
         return write_result
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .map(|()| self.prepare_data_from_buffer())
-    }
-
-    pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
-        return if MIN_PWM < microsec && microsec < MAX_PWM {
-            Ok(microsec << DATA_MULTIPLIER)
-        } else {
-            Err(Error::InvalidValue(microsec))
-        }
-            .and_then(move |payload| {
-                self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, payload)
-            });
-    }
-
-    pub fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
-        return self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, microsec);
-    }
-
-    pub fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<()> {
-        return self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, value as u16);
-    }
-
-    pub fn go_home(self: &mut Self) -> Result<()> {
-        return self.write_command(CommandFlags::GO_HOME);
-    }
-
-    pub fn stop_script(self: &mut Self) -> Result<()> {
-        return self.write_command(CommandFlags::STOP_SCRIPT);
-    }
-
-    pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
-        let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
-
-        return self
-            .read_after_writing(write_result)
-            .map(move |result| result >> DATA_MULTIPLIER);
-    }
-
-    pub fn get_errors(self: &mut Self) -> Result<u16> {
-        let write_result = self.write_command(CommandFlags::GET_ERRORS);
-
-        return self.read_after_writing(write_result);
     }
 }

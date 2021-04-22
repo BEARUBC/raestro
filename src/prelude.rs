@@ -10,7 +10,8 @@
 /* internal mods */
 
 /* internal uses */
-pub use crate::maestro::*;
-// pub use crate::commands::MaestroCommands;
-pub use crate::constants::*;
-pub use crate::errors::*;
+pub use crate::{
+    maestro::*,
+    constants::*,
+    errors::*,
+};
