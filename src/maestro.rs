@@ -120,9 +120,7 @@ impl Maestro {
             .map_err(|rppal_err| Maestro::deconstruct_error(rppal_err));
     }
 
-    fn write(self: &mut Self, length: usize) -> Result<usize, Error> {
-        const MIN_WRITE_LENGTH: usize = 3usize;
-
+    fn write(self: &mut Self, length: usize) -> Result<(), Error> {
         if (length < MIN_WRITE_LENGTH) || (BUFFER_SIZE < length)  {
             panic!();
         }
@@ -136,6 +134,13 @@ impl Maestro {
             .as_mut()
             .unwrap()
             .write(slice)
+            .and_then(|bytes_written|
+                if bytes_written == length {
+                    Ok(())
+                } else {
+                    todo!()
+                }
+            )
             .map_err(|rppal_err| Maestro::deconstruct_error(rppal_err));
     }
 
@@ -146,31 +151,48 @@ impl Maestro {
         channel: Channels,
         microsec: u16,
     ) -> UnitResultType {
-        return if self.write_buf
+        // return if self.write_buf
+        //     .as_mut()
+        //     .is_some() {
+        //         let command = mask_byte(command_flag as u8);
+        //         let (lower, upper) = microsec_to_target(microsec);
+
+        //         let buffer = self.write_buf
+        //             .as_mut()
+        //             .unwrap()
+        //             .as_mut();
+
+        //         buffer[2usize] = command;
+        //         buffer[3usize] = channel as u8;
+        //         buffer[4usize] = lower;
+        //         buffer[5usize] = upper;
+
+        //         self
+        //             .write(6usize)
+        //             .map(|_| ())
+        // } else {
+        //     let err_type = ErrorKind::NotConnected;
+        //     let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
+
+        //     Err(Error::new(err_type, err_msg))
+        // };
+
+        let length_to_write = 6usize;
+
+        let command = mask_byte(command_flag as u8);
+        let (lower, upper) = microsec_to_target(microsec);
+
+        let buffer = self.write_buf
             .as_mut()
-            .is_some() {
-                let command = mask_byte(command_flag as u8);
-                let (lower, upper) = microsec_to_target(microsec);
+            .unwrap()
+            .as_mut();
 
-                let buffer = self.write_buf
-                    .as_mut()
-                    .unwrap()
-                    .as_mut();
+        buffer[2usize] = command;
+        buffer[3usize] = channel as u8;
+        buffer[4usize] = lower;
+        buffer[5usize] = upper;
 
-                buffer[2usize] = command;
-                buffer[3usize] = channel as u8;
-                buffer[4usize] = lower;
-                buffer[5usize] = upper;
-
-                self
-                    .write(6usize)
-                    .map(|_| ())
-        } else {
-            let err_type = ErrorKind::NotConnected;
-            let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
-
-            Err(Error::new(err_type, err_msg))
-        };
+        return self.write(length_to_write);
     }
 
     #[inline]
@@ -179,28 +201,42 @@ impl Maestro {
         command_flag: CommandFlags,
         channel: Channels,
     ) -> UnitResultType {
-        return if self.write_buf
-            .as_mut()
-            .is_some() {
-                let command = mask_byte(command_flag as u8);
+        // return if self.write_buf
+        //     .as_mut()
+        //     .is_some() {
+        //         let command = mask_byte(command_flag as u8);
 
-                let buffer = self.write_buf
-                    .as_mut()
-                    .unwrap()
-                    .as_mut();
+        //         let buffer = self.write_buf
+        //             .as_mut()
+        //             .unwrap()
+        //             .as_mut();
 
-                buffer[2usize] = command;
-                buffer[3usize] = channel as u8;
+        //         buffer[2usize] = command;
+        //         buffer[3usize] = channel as u8;
         
-                self
-                    .write(4usize)
-                    .map(|_| ())
-        } else {
-            let err_type = ErrorKind::NotConnected;
-            let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
+        //         self
+        //             .write(4usize)
+        //             .map(|_| ())
+        // } else {
+        //     let err_type = ErrorKind::NotConnected;
+        //     let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
 
-            Err(Error::new(err_type, err_msg))
-        };
+        //     Err(Error::new(err_type, err_msg))
+        // };
+
+        let length_to_write = 4usize;
+
+        let command = mask_byte(command_flag as u8);
+
+        let buffer = self.write_buf
+            .as_mut()
+            .unwrap()
+            .as_mut();
+
+        buffer[2usize] = command;
+        buffer[3usize] = channel as u8;
+
+        return self.write(length_to_write);
     }
 
     #[inline]
@@ -208,27 +244,40 @@ impl Maestro {
         self: &mut Self,
         command_flag: CommandFlags,
     ) -> UnitResultType {
-        return if self.write_buf
+        // return if self.write_buf
+        //     .as_mut()
+        //     .is_some() {
+        //         let command = mask_byte(command_flag as u8);
+
+        //         let buffer = self.write_buf
+        //             .as_mut()
+        //             .unwrap()
+        //             .as_mut();
+
+        //         buffer[2usize] = command;
+
+        //         self
+        //             .write(3usize)
+        //             .map(|_| ())
+        // } else {
+        //     let err_type = ErrorKind::NotConnected;
+        //     let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
+
+        //     Err(Error::new(err_type, err_msg))
+        // };
+
+        let length_to_write = 3usize;
+
+        let command = mask_byte(command_flag as u8);
+
+        let buffer = self.write_buf
             .as_mut()
-            .is_some() {
-                let command = mask_byte(command_flag as u8);
+            .unwrap()
+            .as_mut();
 
-                let buffer = self.write_buf
-                    .as_mut()
-                    .unwrap()
-                    .as_mut();
+        buffer[2usize] = command;
 
-                buffer[2usize] = command;
-
-                self
-                    .write(3usize)
-                    .map(|_| ())
-        } else {
-            let err_type = ErrorKind::NotConnected;
-            let err_msg = "maestro not initialized; consider calling .start on the maestro instance";
-
-            Err(Error::new(err_type, err_msg))
-        };
+        return self.write(length_to_write);
     }
 
     fn deconstruct_error(rppal_err: UartError) -> Error {
