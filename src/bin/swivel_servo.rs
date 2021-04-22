@@ -22,17 +22,17 @@ fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    let mut position = 992u16;
-    let sleep_time: u64 = 200u64;
+    let pos_min = 992u16;
+    let pos_max = 2000u16;
+    let sleep_time: u64 = 1000u64;
 
     loop {
-        println!("{}", position);
-        maestro.set_target(Channels::C_0, position).unwrap();
+        println!("{}", pos_min);
+        maestro.set_target(Channels::C_0, pos_min).unwrap();
         thread::sleep(Duration::from_millis(sleep_time));
 
-        position += 100u16;
-        if position >= 2_000u16 {
-            position = 992u16;
-        }
+        println!("{}", pos_max);
+        maestro.set_target(Channels::C_0, pos_max).unwrap();
+        thread::sleep(Duration::from_millis(sleep_time));
     }
 }
