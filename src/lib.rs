@@ -13,6 +13,7 @@
 pub mod constants;
 pub mod maestro;
 pub mod prelude;
+pub mod errors;
 mod utils;
 #[cfg(test)]
 mod tests {
