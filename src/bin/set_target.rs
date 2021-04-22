@@ -27,11 +27,9 @@ fn main() -> () {
     let sleep_time: u64 = 1000u64;
 
     loop {
-        println!("{}", pos_min);
         maestro.set_target(Channels::C_0, pos_min).unwrap();
         thread::sleep(Duration::from_millis(sleep_time));
 
-        println!("{}", pos_max);
         maestro.set_target(Channels::C_0, pos_max).unwrap();
         thread::sleep(Duration::from_millis(sleep_time));
     }
