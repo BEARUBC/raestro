@@ -6,12 +6,13 @@
 // except according to those terms.
 
 /* external uses */
-use std::io::Error;
+// use std::io::Error;
 
 /* internal mods */
 
 /* internal uses */
 use crate::constants::Channels;
+use crate::errors::*;
 
 pub type UnitResultType = Result<(), Error>;
 pub type DataResultType = Result<u16, Error>;

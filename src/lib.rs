@@ -10,7 +10,7 @@
 /* external uses */
 
 /* internal mods */
-pub mod commands;
+// pub mod commands;
 pub mod constants;
 pub mod maestro;
 pub mod prelude;
@@ -23,8 +23,10 @@ mod tests {
     /* internal mods */
 
     /* internal uses */
-    use crate::maestro::Maestro;
-    use crate::maestro_constants::BaudRates;
+    use crate::{
+        maestro::*,
+        constants::*,
+    };
 
     #[test]
     fn init_and_close() -> () {
