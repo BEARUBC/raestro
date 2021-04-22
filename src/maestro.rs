@@ -234,16 +234,6 @@ impl Maestro {
         return write_result
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .map(|()| self.prepare_data_from_buffer())
-            // .and_then(move |bytes_read| {
-            //     return if bytes_read == (RESPONSE_SIZE as usize) {
-            //             Ok(self.prepare_data_from_buffer())
-            //     } else {
-            //         let err_type = ErrorKind::ConnectionAborted;
-            //         let err_msg = "maestro message could not be read";
-
-            //         Err(Error::new(err_type, err_msg))
-            //     };
-            // });
     }
 
     pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {

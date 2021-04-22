@@ -15,7 +15,7 @@ use std::{
     fmt::{
         Display,
         Formatter,
-        Result,
+        Result as FmtResult,
     },
 };
 use rppal::{
@@ -53,9 +53,14 @@ impl Error {
 impl StdError for Error {}
 
 impl Display for Error {
-    #[allow(unused)]
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        todo!();
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Error::Uninitialized => write!(f, "maestro struct is uninitialized; please consider calling .start() on the instance first"),
+            Error::InvalidValue(value) => write!(f, "microsec values must be between 992us and 2000us but {} was used", value),
+            Error::FaultyRead { actual_count, expected_count } => write!(f, "{} were expected to be read, but only {} were actually read", expected_count, actual_count),
+            Error::FaultyWrite { actual_count, expected_count } => write!(f, "{} were expected to be written, but only {} were actually written", expected_count, actual_count),
+            Error::Io(io_error) => io_error.fmt(f),
+        }
     }
 }
 
