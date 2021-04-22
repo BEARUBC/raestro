@@ -105,7 +105,7 @@ impl Maestro {
 // public maestro commands
 impl Maestro {
     pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
-        return if MIN_PWM < microsec && microsec < MAX_PWM {
+        return if MIN_PWM <= microsec && microsec <= MAX_PWM {
             Ok(microsec << DATA_MULTIPLIER)
         } else {
             Err(Error::InvalidValue(microsec))
