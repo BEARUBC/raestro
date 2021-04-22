@@ -71,3 +71,4 @@ fn main() -> () {
 	assert_eq!(position, actual_position);
 }
 ```
+More examples of API usage are provided in the src/bin folder.
