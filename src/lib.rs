@@ -5,12 +5,15 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+
 //! An interface for the Pololu Micro Maestro 6-Channel Servo Controller Board.
 //!
 //! `Raestro` provides an easy-to-use interface to communicate with the 6-Channel Maestro.
 //!
 //! # Prelude
-//! Before continuing, please take note of the following points.
+//! Before continuing, please take note of the following points:
 //! * This library is developed specifically for the Raspberry Pi. Builds on different architectures will not be guaranteed to work.
 //! * Please take caution in wiring the Pololu Micro Maestro to the Raspberry Pi. Incorrect wiring may lead to permanent hardware damage.
 //!
@@ -71,9 +74,9 @@
 
 /* internal mods */
 pub mod constants;
-pub mod maestro;
+mod maestro;
 pub mod prelude;
-pub mod errors;
+mod errors;
 mod utils;
 #[cfg(test)]
 mod tests {
@@ -96,4 +99,5 @@ mod tests {
 }
 
 /* internal uses */
-pub use maestro::Maestro;
+pub use maestro::*;
+pub use errors::*;

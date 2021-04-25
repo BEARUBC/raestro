@@ -28,18 +28,26 @@ use crate::{
     errors::*,
 };
 
+/// Public result type.
+///
+/// Expands to `std::result::Result<T, raestro::error::Error>`.
 pub type Result<T> = StdResult<T, Error>;
 
+const DEFAULT_BLOCKING_DURATION: Duration = Duration::from_secs(2u64);
 const BUFFER_SIZE: usize = 6usize;
 
-/// ['Maestro'] struct
+/// The main wrapper around the Maesetro communications interface
+///
+/// The `impl` blocks for this struct are split into three sections, one of which is private and hidden from documentation:
+/// 1. Basic public APIs; contains the standard APIs to create, initailize, and close a Maestro instance
+/// 2. Pololu Micro Maestro Protocols; all the protocols supported by the Maestro, sendable over the `UART` GPIO pins on the Raspberry Pi.
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
     write_buf: Option<Box<[u8; BUFFER_SIZE]>>,
 }
 
-// basic public APIs
+/// Basic public APIs
 impl Maestro {
     /// test doc
     pub fn new() -> Self {
@@ -60,7 +68,7 @@ impl Maestro {
 
         return uart_result
             .and_then(|uart| {
-                let block_duration = 2u64;
+                // let block_duration = 2u64;
 
                 self.uart = Some(Box::new(uart));
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
@@ -70,7 +78,7 @@ impl Maestro {
                     .as_mut()
                     .unwrap()
                     .as_mut()
-                    .set_read_mode(RESPONSE_SIZE, Duration::from_secs(block_duration));
+                    .set_read_mode(RESPONSE_SIZE, DEFAULT_BLOCKING_DURATION);
             })
             .map(|()| {
                 let buf = self.write_buf
@@ -104,7 +112,7 @@ impl Maestro {
     }
 }
 
-// public maestro commands
+/// Pololu Micro Maestro Protocols
 impl Maestro {
     pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
         return if MIN_PWM <= microsec && microsec <= MAX_PWM {
@@ -148,10 +156,32 @@ impl Maestro {
     }
 }
 
-// private utility methods
+/// Private utility methods
+///
+/// All hidden from public documentation.
+///
+/// Provide basic utilities and abstracted functionality to the rest of the program
+///
+/// Please note that all methods in this `impl` block operate on the assumption that 'self.start()' has been called.
+/// Since these are private methods, calls to these methods can only be made by `Maestro` methods, *NOT* public callers.
+/// Therefore, operating under the assumptions that `self.start()` has been called and panicking otherwise is appropriate.
+/// Before calling these methods, please ensure that `self.start()` has been called. This can easily be checked by ensuring that
+/// `self.uart`, `read_buf`, and `write_buf` are the Some(_) variants.
 impl Maestro {
+
+    /// Reads the given number of bytes into `self.read_buf`.
+    ///
+    /// Please note that the `self.uart.read` method is being utilized to send the commands over `UART`.
+    /// This command operates on a blocking read.
+    /// Blocking duration is default set to `DEFAULT_BLOCKING_DURATION`.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `length` is strictly greater than the `BUFFER_SIZE`
+    /// * `self.read_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
+    /// * `self.uart` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
     fn read(self: &mut Self, length: usize) -> Result<()> {
-        if BUFFER_SIZE < length {
+        if length > BUFFER_SIZE {
             panic!();
         }
         
@@ -177,8 +207,19 @@ impl Maestro {
             );
     }
 
+    /// Writes the given number of bytes over to the Maestro.
+    ///
+    /// The bytes that are being written are located in the `self.write_buf` array.
+    /// This is the method that actually calls `self.uart.write`. Other methods in this `impl` block just write to `self.write_buf`, but
+    /// do not actually send data over the `UART` pins.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `length` is strictly greater than the `BUFFER_SIZE`
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
+    /// * `self.uart` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
     fn write(self: &mut Self, length: usize) -> Result<()> {
-        if (length < MIN_WRITE_LENGTH) || (BUFFER_SIZE < length)  {
+        if (length < MIN_WRITE_LENGTH) || (length > BUFFER_SIZE)  {
             panic!();
         }
 
@@ -204,6 +245,14 @@ impl Maestro {
             );
     }
 
+    /// Writes the given arguments into the appropriate place in `self.write_buf`.
+    ///
+    /// This method does not actually send the bytes over the `UART` pins. It just writes them into the correct place in the buffer
+    /// and then calls `self.write` while passing in the desired length.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
     #[inline]
     fn write_channel_and_payload(
         self: &mut Self,
@@ -229,6 +278,14 @@ impl Maestro {
         return self.write(length_to_write);
     }
 
+    /// Writes the given arguments into the appropriate place in `self.write_buf`.
+    ///
+    /// This method does not actually send the bytes over the `UART` pins. It just writes them into the correct place in the buffer
+    /// and then calls `self.write` while passing in the desired length.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
     #[inline]
     fn write_channel(
         self: &mut Self,
@@ -250,6 +307,14 @@ impl Maestro {
         return self.write(length_to_write);
     }
 
+    /// Writes the given arguments into the appropriate place in `self.write_buf`.
+    ///
+    /// This method does not actually send the bytes over the `UART` pins. It just writes them into the correct place in the buffer
+    /// and then calls `self.write` while passing in the desired length.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
     #[inline]
     fn write_command(
         self: &mut Self,
@@ -269,6 +334,13 @@ impl Maestro {
         return self.write(length_to_write);
     }
 
+    /// Utility function to take the first two bytes in `self.read_buf` and convert them from Pololu standardized-return-form
+    /// to u16.
+    ///
+    /// # Panics
+    /// Panics if:
+    /// * `self.read_buf` array is the `None` variant; in this case, the `self` instance has NOT been initialized.
+    #[inline]
     fn prepare_data_from_buffer(self: &mut Self) -> u16 {
         let buf = self.read_buf
             .as_mut()
@@ -280,6 +352,11 @@ impl Maestro {
         return data;
     }
 
+    /// Takes the write result and applies immediately calls for a read after.
+    ///
+    /// Useful abstraction over Pololu protocols that send data back right after a request.
+    /// For example, a request to `get_position` will require first a `write`, and then immediately a `read_after_writing`.
+    /// Therefore, for those types of situations, use this method.
     fn read_after_writing(self: &mut Self, write_result: Result<()>) -> Result<u16> {
         return write_result
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
