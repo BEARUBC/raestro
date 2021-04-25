@@ -49,8 +49,20 @@ pub struct Maestro {
 
 /// # Basic public APIs
 /// This section contains all the APIs required to get a `maestro` instance up and running.
+///
+/// ## Definitions
+/// An 'initialized' `maestro` instance is defined as an instance in which struct fields are the `Some(_)` variant.
+///
+/// An 'uninitialized' `maestro` instance is an instance in which all fields are the `None` variant.
+///
+/// An 'invalid' `maestro` instance is an instance which does not fit the above definitions.
+///
+/// All valid `maestro` instances must either uninitialized or initialized. An invalid `maestro` instance will result in undefined behaviour.
+/// All methods below are proved to either only transition a `maestro` instance to uninitialized and initialized states only.
+/// Therefore, invalid states are impossible to reach.
+/// This is an invariant which must (and will) be guaranteed for all provided APIs.
 impl Maestro {
-    /// test doc
+    /// Creates a new 
     pub fn new() -> Self {
         return Maestro {
             uart: None,
@@ -59,6 +71,13 @@ impl Maestro {
         };
     }
 
+    /// Transitions the given `maestro` instance to the 'initialized state' with default configuration values.
+    ///
+    /// Default block duration is set to `2seconds`.
+    ///
+    /// Returns an error if any fields were unable to be initialized.
+    /// In the case of this failure, this instance will be closed and will be transitioned *back* into the 'uninitialized' state.
+    /// This is done to prevent any leakage of `maestro` instances into the 'invalid' state.
     pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<()> {
         let uart_result: RppalResult<Uart> = Uart::new(
             baud_rate as u32,
@@ -69,8 +88,6 @@ impl Maestro {
 
         return uart_result
             .and_then(|uart| {
-                // let block_duration = 2u64;
-
                 self.uart = Some(Box::new(uart));
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
                 self.write_buf = Some(Box::new([0u8; BUFFER_SIZE]));
@@ -93,6 +110,9 @@ impl Maestro {
             .map_err(|rppal_err| Error::from(rppal_err));
     }
 
+    /// Closes the `maestro` instance (i.e., transitions the `maestro` instance *back* into the 'uninitialized' state).
+    ///
+    /// This instance is no longer usable to communicate with the Maestro, unless until `Maestro::start()` is called again.
     pub fn close(self: &mut Self) -> () {
         self.uart = None;
         self.read_buf = None;
