@@ -113,7 +113,29 @@ impl Maestro {
 }
 
 /// Pololu Micro Maestro Protocols
+///
+/// These protocols are officially supported by the Pololu Micro Maestro 6-Channel
+///
+/// For interacting with the Pololu, the "Pololu Protocol" is being utilized.
+/// More information on this Pololu Protocol can be found at the official Pololu Micro Maestro documentation pages, available [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
+/// Information on the available serial commands, as well as the specific protocols officially supported (for each type of Maestro), is available in section 5.e.
 impl Maestro {
+
+    /// Sets the target of the servo motor at the given channel with the given microseconds.
+    ///
+    /// Microsecond ranges can only be between `992microsecs` and `2000microsecs`.
+    /// Any values outside of this range will return an error.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let microsec: u16 = 1234u16; // can be any value between 992u16 and 2000u16
+    ///
+    /// m.set_target(channel, microsec);
+    /// ```
     pub fn set_target(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
         return if MIN_PWM <= microsec && microsec <= MAX_PWM {
             Ok(microsec << DATA_MULTIPLIER)
@@ -125,22 +147,108 @@ impl Maestro {
             });
     }
 
-    pub fn set_speed(self: &mut Self, channel: Channels, microsec: u16) -> Result<()> {
-        return self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, microsec);
+    /// Sets the rotational speed of the servo motor at the given channel with the given speed.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let speed: u16 = 10u16;
+    ///
+    /// m.set_speed(channel, speed);
+    /// ```
+    ///
+    /// # TODO
+    /// Search up the max speed value allowable.
+    pub fn set_speed(self: &mut Self, channel: Channels, speed: u16) -> Result<()> {
+        return self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed);
     }
 
-    pub fn set_acceleration(self: &mut Self, channel: Channels, value: u8) -> Result<()> {
-        return self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, value as u16);
+    /// Sets the rotational acceleration of the servo motor at the given channel with the given value.
+    ///
+    /// The acceleration can be any usigned 8-bit integer from `1u8` to `255u8`.
+    /// An acceleration of `0u8` will command the Maestro to reject the request.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let acceleration: u16 = 10u16;
+    ///
+    /// m.set_acceleration(channel, acceleration);
+    /// ```
+    ///
+    /// # TODO:
+    /// Check if the Maestro actually rejects the request or just doesn't move if `0u8` is sent as the acceleration.
+    pub fn set_acceleration(self: &mut Self, channel: Channels, acceleration: u8) -> Result<()> {
+        return self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16);
     }
 
+    /// Sends all servos to home position.
+    ///
+    /// Home position is defined as `992microsecs`.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// m.go_home();
+    /// ```
     pub fn go_home(self: &mut Self) -> Result<()> {
         return self.write_command(CommandFlags::GO_HOME);
     }
 
+    /// Stops all requested actions sent to the Maestro to be stopped immediately.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// m.stop_script();
+    /// ```
+    ///
+    /// # TODO
+    /// Find out how the Maestro implements `stop_script`.
     pub fn stop_script(self: &mut Self) -> Result<()> {
         return self.write_command(CommandFlags::STOP_SCRIPT);
     }
 
+    /// Gets the `PWM` signal being broadcasted to the servo at the given channel.
+    ///
+    /// # Important
+    /// In order to rotate the servos, the Maestro sends a PWM signal over the corresponding channel.
+    /// This is, in essence, what is happening when `set_target` is called.
+    /// However, this signal can still be sent even if a servo motor is not connected to the pins; the only difference
+    /// here being that no servo is connected to execute the rotation, but the signal is *still sent*, regardless.
+    ///
+    /// The `get_position' request will only return the `PWM` that is being broadcasted on the channel.
+    /// Using this method will NOT help you in determining servo failures, incorrect servo positions, etc.
+    /// This method will *only* return the PWM that is being broadcasted on the given channel.
+    ///
+    /// The Maestro, in and of itself, cannot possibly know if a servo is or is not at the location that was encoded
+    /// in the request (i.e., if the servo failed half-way through exectution). As such, `raestro` cannot support this functionality either.
+    /// If this functionality is required for your project, you will need to develop additional hardware.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let position: u16 = 1234u16; // can be any value between 992u16 and 2000u16
+    ///
+    /// m.set_target(channel, position);
+    ///
+    /// let actual_position = m.get_position(channel).unwrap();
+    ///
+    /// assert_eq!(position, actual_position);
+    /// ```
     pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
@@ -149,6 +257,18 @@ impl Maestro {
             .map(move |result| result >> DATA_MULTIPLIER);
     }
 
+    /// Gets any errors encountered by the Maestro during execution.
+    ///
+    /// # Important
+    /// This method will *not* inform you of any failures with the servo hardware.
+    ///
+    /// # Example Usage
+    /// ```
+    /// let mut m = Maestro::new();
+    /// m.start(BaudRates::BR_115200).unwrap();
+    ///
+    /// let errors = m.get_errors().unwrap();
+    /// ```
     pub fn get_errors(self: &mut Self) -> Result<u16> {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
