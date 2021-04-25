@@ -38,16 +38,17 @@ const BUFFER_SIZE: usize = 6usize;
 
 /// The main wrapper around the Maesetro communications interface
 ///
-/// The `impl` blocks for this struct are split into three sections, one of which is private and hidden from documentation:
+/// The `impl` blocks for this struct are split into three sections, two of which are included below, with the remaining being private and hidden from documentation:
 /// 1. Basic public APIs; contains the standard APIs to create, initailize, and close a Maestro instance
-/// 2. Pololu Micro Maestro Protocols; all the protocols supported by the Maestro, sendable over the `UART` GPIO pins on the Raspberry Pi.
+/// 2. Pololu Micro Maestro Protocols; all the protocols supported by the Maestro, sendable over the `UART` pins on the Raspberry Pi
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
     write_buf: Option<Box<[u8; BUFFER_SIZE]>>,
 }
 
-/// Basic public APIs
+/// # Basic public APIs
+/// This section contains all the APIs required to get a `maestro` instance up and running.
 impl Maestro {
     /// test doc
     pub fn new() -> Self {
@@ -98,6 +99,17 @@ impl Maestro {
         self.write_buf = None;
     }
 
+    /// Configures the block duration to the passed in value.
+    ///
+    /// Default block duration is set to `2seconds`.
+    ///
+    /// # Note
+    /// Reading from the Maestro is implemented as a *blocking* read.
+    /// Given that the Maestro only writes back when requested to do so, and that writes coming from the Maestro happen immediately after requests sent to it,
+    /// (implying that waiting times are minimal), a blocking read is sufficient (and probably more efficient than implementing
+    /// any sort of asynchronous functionality).
+    ///
+    /// Returns an error if the `maestro` instance has not been initialized by calling `Maestro::start()`.
     pub fn set_block_duration(self: &mut Self, duration: Duration) -> Result<()> {
         return self.uart
             .as_mut()
@@ -112,12 +124,13 @@ impl Maestro {
     }
 }
 
-/// Pololu Micro Maestro Protocols
+/// # Pololu Micro Maestro Protocols
 ///
-/// These protocols are officially supported by the Pololu Micro Maestro 6-Channel
+/// These protocols are officially supported by the Pololu Micro Maestro 6-Channel.
 ///
-/// For interacting with the Pololu, the "Pololu Protocol" is being utilized.
-/// More information on this Pololu Protocol can be found at the official Pololu Micro Maestro documentation pages, available [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
+/// For interacting with the Pololu, the official "Pololu-Protocol" is being utilized.
+///
+/// More information on the Pololu-Protocol can be found at the official Pololu Micro Maestro documentation pages, available [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
 /// Information on the available serial commands, as well as the specific protocols officially supported (for each type of Maestro), is available in section 5.e.
 impl Maestro {
 
@@ -227,9 +240,9 @@ impl Maestro {
     /// However, this signal can still be sent even if a servo motor is not connected to the pins; the only difference
     /// here being that no servo is connected to execute the rotation, but the signal is *still sent*, regardless.
     ///
-    /// The `get_position' request will only return the `PWM` that is being broadcasted on the channel.
+    /// The `get_position` request will only return the `PWM` that is being broadcasted on the channel.
     /// Using this method will NOT help you in determining servo failures, incorrect servo positions, etc.
-    /// This method will *only* return the PWM that is being broadcasted on the given channel.
+    /// This method will *only* return the `PWM` that is being broadcasted on the given channel.
     ///
     /// The Maestro, in and of itself, cannot possibly know if a servo is or is not at the location that was encoded
     /// in the request (i.e., if the servo failed half-way through exectution). As such, `raestro` cannot support this functionality either.
@@ -261,6 +274,8 @@ impl Maestro {
     ///
     /// # Important
     /// This method will *not* inform you of any failures with the servo hardware.
+    /// The Maestro, in and of itself, is not capable of determining external hardware malfunctions.
+    /// If your project requires this feature, you will need to develop additional hardware to implement it.
     ///
     /// # Example Usage
     /// ```
