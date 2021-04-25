@@ -32,6 +32,7 @@ pub type Result<T> = StdResult<T, Error>;
 
 const BUFFER_SIZE: usize = 6usize;
 
+/// ['Maestro'] struct
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
