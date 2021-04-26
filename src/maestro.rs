@@ -51,7 +51,7 @@ pub struct Maestro {
 /// This section contains all the APIs required to get a `maestro` instance up and running.
 ///
 /// ## Definitions
-/// An `initialized  `maestro` instance is defined as an instance in which struct fields are the `Some(_)` variant.
+/// An `initialized` `maestro` instance is defined as an instance in which struct fields are the `Some(_)` variant.
 ///
 /// An `uninitialized` `maestro` instance is an instance in which all fields are the `None` variant.
 ///
@@ -135,8 +135,6 @@ impl Maestro {
             .as_mut()
             .ok_or(Error::Uninitialized)
             .and_then(|uart| {
-                const RESPONSE_SIZE: u8 = 2u8;
-
                 return uart
                     .set_read_mode(RESPONSE_SIZE, duration)
                     .map_err(|rppal_err| Error::from(rppal_err));
@@ -304,10 +302,12 @@ impl Maestro {
     ///
     /// let errors = m.get_errors().unwrap();
     /// ```
-    pub fn get_errors(self: &mut Self) -> Result<u16> {
+    pub fn get_errors(self: &mut Self) -> Result<Errors> {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
-        return self.read_after_writing(write_result);
+        return self
+            .read_after_writing(write_result)
+            .map(|data| Errors::from(data));
     }
 }
 
