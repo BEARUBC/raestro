@@ -105,6 +105,8 @@ pub enum BaudRates {
 ///
 /// # TODO
 /// Review existing docs for this enum and add more iff necessary.
+///
+/// ADD DOCUMENTATION FOR ALL VARIANTS DOWN BELOW!
 #[allow(non_camel_case_types)]
 #[derive(Debug, Copy, Clone)]
 #[repr(u16)]
