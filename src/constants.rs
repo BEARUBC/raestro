@@ -137,7 +137,6 @@ impl From<u16> for Errors {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()
-        }
-        // return unsafe { std::mem::transmute(data) };
+        };
     }
 }

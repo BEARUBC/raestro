@@ -107,7 +107,11 @@ impl Maestro {
                 buf[0usize] = SYNC as u8;
                 buf[1usize] = DEVICE_NUMBER as u8;
             })
-            .map_err(|rppal_err| Error::from(rppal_err));
+            .map_err(|rppal_err| {
+                self.close();
+
+                return Error::from(rppal_err);
+            });
     }
 
     /// Closes the `maestro` instance (i.e., transitions the `maestro` instance *back* into the `uninitialized` state).
