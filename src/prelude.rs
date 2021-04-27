@@ -5,6 +5,10 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//! Convenience public exports.
+//!
+//! Encapsulates all modules required for general usage of the `raestro` library.
+
 /* external uses */
 
 /* internal mods */

@@ -49,11 +49,17 @@ pub enum Error {
     /// Occurs when the expected number of bytes received from the Maestro do not equal `RESPONSE_SIZE`.
     ///
     /// `FaultyRead.0` is the number of bytes actually read.
-    FaultyRead(usize),
+    FaultyRead {
+        #[allow(missing_docs)]
+        actual_count: usize,
+    },
 
     /// Occurs when the expected number of bytes written to the Maestro were incorrect (according to the protocol being sent).
     FaultyWrite {
+        #[allow(missing_docs)]
         actual_count: usize,
+        
+        #[allow(missing_docs)]
         expected_count: usize,
     },
 
@@ -80,9 +86,9 @@ impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         return match self {
             Error::Uninitialized => write!(f, "maestro struct is uninitialized; please consider calling .start() on the instance first"),
-            Error::InvalidValue(value) => write!(f, "microsec values must be between 992us and 2000us but {} was used", value),
-            Error::FaultyRead { actual_count, expected_count } => write!(f, "{} were expected to be read, but only {} were actually read", expected_count, actual_count),
-            Error::FaultyWrite { actual_count, expected_count } => write!(f, "{} were expected to be written, but only {} were actually written", expected_count, actual_count),
+            Error::InvalidValue(value) => write!(f, "microsec values must be between 992us and 2000us but {}us was used", value),
+            Error::FaultyRead { actual_count, } => write!(f, "2 bytes were expected to be read, but only {} bytes were actually read", actual_count),
+            Error::FaultyWrite { actual_count, expected_count, } => write!(f, "{} bytes were expected to be written, but only {} bytes were actually written", expected_count, actual_count),
             Error::Io(io_error) => io_error.fmt(f),
         };
     }

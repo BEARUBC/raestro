@@ -5,6 +5,13 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
+//! All constants defined and used by the Maestro for `UART` communication
+//! through the Pololu-Protocol.
+//!
+//! The specifics on the Pololu-Protoco, as well as the overall serial communication
+//! with the Maestro, can be found in the Pololu Micro-Maestro manual, located [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
+//! in section 5.e.
+
 /* external uses */
 
 /* internal mods */
@@ -70,11 +77,11 @@ pub enum Channels {
     C_5 = 0x5u8,
 }
 
-/// Available baudrates supported by the Maestro
+/// Available baudrates supported by the Maestro.
 ///
-/// Note that not all baudrates have been specified
+/// Note that not all baudrates have been specified.
 /// # TODO
-/// Add all remaining baudrates to the enum below
+/// Add all remaining baudrates to the enum below.
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone)]
 #[repr(u32)]
@@ -86,9 +93,9 @@ pub enum BaudRates {
     BR_115200 = 115200u32,
 }
 
-/// All available errors as
+/// All available errors throwable by the Maestro.
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[repr(u16)]
 pub enum Errors {
     #[allow(missing_docs)]
@@ -120,19 +127,17 @@ pub enum Errors {
 }
 
 impl From<u16> for Errors {
+
+    /// Converts a raw `u16` into an `Errors` type.
+    ///
+    /// Given that the underlying `Errors` types are represented by `u16s`, the conversion should not
+    /// result in any undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        // return match data {
-        //     0u16 => Errors::SER_SIGNAL_ERR,
-        //     1u16 => Errors::SER_OVERRUN_ERR,
-        //     2u16 => Errors::SER_BUFFER_FULL,
-        //     3u16 => Errors::SER_CRC_ERR,
-        //     4u16 => Errors::SER_PROTOCOL_ERR,
-        //     5u16 => Errors::SER_TIMEOUT,
-        //     6u16 => Errors::SCRIPT_STACK_ERR,
-        //     7u16 => Errors::SCRIPT_CALL_STACK_ERR,
-        //     8u16 => Errors::SCRIPT_PC_ERR,
-        //     _ => panic!(),
-        // };
-        return unsafe { std::mem::transmute(data) };
+        return if (data >= (Errors::SER_SIGNAL_ERR as u16)) && (data <= (Errors::SCRIPT_PC_ERR as u16)) {
+            unsafe { std::mem::transmute(data) }
+        } else {
+            panic!()
+        }
+        // return unsafe { std::mem::transmute(data) };
     }
 }

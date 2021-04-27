@@ -356,7 +356,6 @@ impl Maestro {
                 } else {
                     Err(Error::FaultyRead {
                         actual_count: bytes_read,
-                        expected_count: length
                     })
                 }
             );
