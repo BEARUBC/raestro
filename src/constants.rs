@@ -37,8 +37,11 @@ pub const MIN_PWM: u16 = 992u16;
 pub const MAX_PWM: u16 = 2000u16;
 
 /// All available command flags supported by the Pololu-Protocol.
+///
+/// # TODO
+/// Review existing docs for this enum and add more iff necessary.
 #[allow(non_camel_case_types, unused)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[repr(u8)]
 pub(crate) enum CommandFlags {
     SET_TARGET = 0x84u8,
@@ -54,8 +57,11 @@ pub(crate) enum CommandFlags {
 }
 
 /// All available channels to send commands to.
+///
+/// # TODO
+/// Review existing docs for this enum and add more iff necessary.
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[repr(u8)]
 pub enum Channels {
     #[allow(missing_docs)]
@@ -82,8 +88,10 @@ pub enum Channels {
 /// Note that not all baudrates have been specified.
 /// # TODO
 /// Add all remaining baudrates to the enum below.
+///
+/// Review existing docs for this enum and add more iff necessary.
 #[allow(non_camel_case_types)]
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[repr(u32)]
 pub enum BaudRates {
     #[allow(missing_docs)]
@@ -94,35 +102,21 @@ pub enum BaudRates {
 }
 
 /// All available errors throwable by the Maestro.
+///
+/// # TODO
+/// Review existing docs for this enum and add more iff necessary.
 #[allow(non_camel_case_types)]
 #[derive(Debug, Copy, Clone)]
 #[repr(u16)]
 pub enum Errors {
-    #[allow(missing_docs)]
     SER_SIGNAL_ERR = 0u16,
-
-    #[allow(missing_docs)]
     SER_OVERRUN_ERR = 1u16,
-
-    #[allow(missing_docs)]
     SER_BUFFER_FULL = 2u16,
-
-    #[allow(missing_docs)]
     SER_CRC_ERR = 3u16,
-
-    #[allow(missing_docs)]
     SER_PROTOCOL_ERR = 4u16,
-
-    #[allow(missing_docs)]
     SER_TIMEOUT = 5u16,
-
-    #[allow(missing_docs)]
     SCRIPT_STACK_ERR = 6u16,
-
-    #[allow(missing_docs)]
     SCRIPT_CALL_STACK_ERR = 7u16,
-
-    #[allow(missing_docs)]
     SCRIPT_PC_ERR = 8u16,
 }
 

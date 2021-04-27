@@ -41,6 +41,7 @@ const BUFFER_SIZE: usize = 6usize;
 /// The `impl` blocks for this struct are split into three sections, two of which are included below, with the remaining being private and hidden from documentation:
 /// 1. Basic public APIs; contains the standard APIs to create, initailize, and close a Maestro instance
 /// 2. Pololu Micro Maestro Protocols; all the protocols supported by the Maestro, sendable over the `UART` pins on the Raspberry Pi
+#[derive(Debug)]
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
