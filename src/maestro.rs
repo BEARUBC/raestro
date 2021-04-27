@@ -36,7 +36,7 @@ pub type Result<T> = StdResult<T, Error>;
 const DEFAULT_BLOCKING_DURATION: Duration = Duration::from_secs(2u64);
 const BUFFER_SIZE: usize = 6usize;
 
-/// The main wrapper around the Maesetro communications interface
+/// The main wrapper around the Maestro communications interface.
 ///
 /// The `impl` blocks for this struct are split into three sections, two of which are included below, with the remaining being private and hidden from documentation:
 /// 1. Basic public APIs; contains the standard APIs to create, initailize, and close a Maestro instance

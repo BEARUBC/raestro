@@ -10,7 +10,7 @@
 
 //! An interface for the Pololu Micro Maestro 6-Channel Servo Controller Board.
 //!
-//! `Raestro` provides an easy-to-use interface to communicate with the 6-Channel Maestro.
+//! `raestro` provides an easy-to-use interface to communicate with the 6-Channel Maestro.
 //!
 //! # Prelude
 //! Before continuing, please take note of the following points:

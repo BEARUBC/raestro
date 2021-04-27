@@ -5,7 +5,7 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//! Convenience public exports.
+//! Public convenience exports.
 //!
 //! Encapsulates all modules required for general usage of the `raestro` library.
 
