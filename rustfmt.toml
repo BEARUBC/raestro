@@ -28,7 +28,8 @@ match_block_trailing_comma = true
 
 # Function
 fn_single_line = true
-fn_args_layout = "Compressed"
+fn_args_layout = "Tall"
+fn_call_width = 60
 
 # Imports
 reorder_imports = true
@@ -55,8 +56,8 @@ edition = "2018"
 use_field_init_shorthand = true
 
 # General
-max_width = 50
-use_small_heuristics = "Off"
+max_width = 100
+use_small_heuristics = "Default"
 overflow_delimited_expr = true
 blank_lines_upper_bound = 2
 
