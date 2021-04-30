@@ -2,14 +2,18 @@
 //
 // Licensed under the MIT license
 // <LICENSE.md or https://opensource.org/licenses/MIT>.
-// This file may not be copied, modified, or distributed
-// except according to those terms.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
 
 // external crates
 
 // external uses
+use std::{
+    thread,
+    time::Duration,
+};
+
 use raestro::prelude::*;
-use std::{thread, time::Duration};
 
 // internal mods
 
@@ -26,17 +30,30 @@ fn main() -> () {
     let pos_min = 992u16;
     let pos_max = 2000u16;
 
-    let sleep_time = Duration::from_millis(1000u64);
+    let sleep_time =
+        Duration::from_millis(1000u64);
 
     loop {
-        maestro.set_target(channel0, pos_min).unwrap();
-        maestro.set_target(channel1, pos_min).unwrap();
-        maestro.set_target(channel2, pos_min).unwrap();
+        maestro
+            .set_target(channel0, pos_min)
+            .unwrap();
+        maestro
+            .set_target(channel1, pos_min)
+            .unwrap();
+        maestro
+            .set_target(channel2, pos_min)
+            .unwrap();
         thread::sleep(sleep_time);
 
-        maestro.set_target(channel0, pos_max).unwrap();
-        maestro.set_target(channel1, pos_max).unwrap();
-        maestro.set_target(channel2, pos_max).unwrap();
+        maestro
+            .set_target(channel0, pos_max)
+            .unwrap();
+        maestro
+            .set_target(channel1, pos_max)
+            .unwrap();
+        maestro
+            .set_target(channel2, pos_max)
+            .unwrap();
         thread::sleep(sleep_time);
     }
 }

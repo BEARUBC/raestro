@@ -2,14 +2,15 @@
 //
 // Licensed under the MIT license
 // <LICENSE.md or https://opensource.org/licenses/MIT>.
-// This file may not be copied, modified, or distributed
-// except according to those terms.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
 
-//! All constants defined and used by the Maestro for `UART` communication
-//! through the Pololu-Protocol.
+//! All constants defined and used by the Maestro
+//! for `UART` communication through the
+//! Pololu-Protocol.
 //!
-//! The specifics on the Pololu-Protoco, as well as the overall serial communication
-//! with the Maestro, can be found in the Pololu Micro-Maestro manual, located [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
+//! The specifics on the Pololu-Protoco, as well
+//! as the overall serial communication with the Maestro, can be found in the Pololu Micro-Maestro manual, located [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
 //! in section 5.e.
 
 // external uses
@@ -26,20 +27,28 @@ pub(crate) const MIN_WRITE_LENGTH: usize = 3usize;
 pub(crate) const RESPONSE_SIZE: u8 = 2u8;
 pub(crate) const DATA_MULTIPLIER: usize = 2usize;
 
-/// The minimum PWM that can be sent to any channel by the Maestro.
+/// The minimum PWM that can be sent to any
+/// channel by the Maestro.
 ///
-/// All values below `MIN_PWM` being used as parameters to `set_target` will result in an error.
+/// All values below `MIN_PWM` being used as
+/// parameters to `set_target` will result in an
+/// error.
 pub const MIN_PWM: u16 = 992u16;
 
-/// The maximum PWM that can be sent to any channel by the Maestro.
+/// The maximum PWM that can be sent to any
+/// channel by the Maestro.
 ///
-/// All values above `MAX_PWM` being used as parameters to `set_target` will result in an error.
+/// All values above `MAX_PWM` being used as
+/// parameters to `set_target` will result in an
+/// error.
 pub const MAX_PWM: u16 = 2000u16;
 
-/// All available command flags supported by the Pololu-Protocol.
+/// All available command flags supported by the
+/// Pololu-Protocol.
 ///
 /// # TODO
-/// Review existing docs for this enum and add more iff necessary.
+/// Review existing docs for this enum and add
+/// more iff necessary.
 #[allow(non_camel_case_types, unused)]
 #[derive(Debug, Copy, Clone)]
 #[repr(u8)]
@@ -52,14 +61,16 @@ pub(crate) enum CommandFlags {
     GO_HOME = 0xA2u8,
     STOP_SCRIPT = 0xA4u8,
     RESTART_SCRIPT_AT_SUBROUTINE = 0xA7u8,
-    RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER = 0xA8u8,
+    RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER =
+        0xA8u8,
     GET_SCRIPT_STATUS = 0xAEu8,
 }
 
 /// All available channels to send commands to.
 ///
 /// # TODO
-/// Review existing docs for this enum and add more iff necessary.
+/// Review existing docs for this enum and add
+/// more iff necessary.
 #[allow(non_camel_case_types)]
 #[derive(Debug, Copy, Clone)]
 #[repr(u8)]
@@ -85,11 +96,12 @@ pub enum Channels {
 
 /// Available baudrates supported by the Maestro.
 ///
-/// Note that not all baudrates have been specified.
-/// # TODO
+/// Note that not all baudrates have been
+/// specified. # TODO
 /// Add all remaining baudrates to the enum below.
 ///
-/// Review existing docs for this enum and add more iff necessary.
+/// Review existing docs for this enum and add
+/// more iff necessary.
 #[allow(non_camel_case_types)]
 #[derive(Debug, Copy, Clone)]
 #[repr(u32)]
@@ -104,7 +116,8 @@ pub enum BaudRates {
 /// All available errors throwable by the Maestro.
 ///
 /// # TODO
-/// Review existing docs for this enum and add more iff necessary.
+/// Review existing docs for this enum and add
+/// more iff necessary.
 ///
 /// ADD DOCUMENTATION FOR ALL VARIANTS DOWN BELOW!
 #[allow(non_camel_case_types)]
@@ -123,13 +136,18 @@ pub enum Errors {
 }
 
 impl From<u16> for Errors {
-    /// Converts a raw `u16` into an `Errors` type.
+    /// Converts a raw `u16` into an `Errors`
+    /// type.
     ///
-    /// Given that the underlying `Errors` types are represented by `u16s`, the conversion should not
-    /// result in any undefined or erroneous behaviour.
+    /// Given that the underlying `Errors` types
+    /// are represented by `u16s`, the
+    /// conversion should not result in any
+    /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        return if (data >= (Errors::SER_SIGNAL_ERR as u16))
-            && (data <= (Errors::SCRIPT_PC_ERR as u16))
+        return if (data
+            >= (Errors::SER_SIGNAL_ERR as u16))
+            && (data
+                <= (Errors::SCRIPT_PC_ERR as u16))
         {
             unsafe { std::mem::transmute(data) }
         } else {

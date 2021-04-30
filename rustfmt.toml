@@ -1,32 +1,67 @@
 # This rustfmt file is added for configuration, but in practice much of our
 # code is hand-formatted, frequently with more readable results.
 
+# Todo: report_todo and report_fixme
+
+# Modules
+reorder_modules = true
+reorder_impl_items = true
+merge_derives = true
+
+# Style
+## Braces
+brace_style = "SameLineWhere"
+
+## Spaces
+tab_spaces = 4
+spaces_around_ranges = false
+space_before_colon = false
+space_after_colon = true
+inline_attribute_width = 0
+indent_style = "Block"
+
+## Punctuation
+type_punctuation_density = "Wide"
+trailing_semicolon = true
+trailing_comma = "Vertical"
+match_block_trailing_comma = true
+
+# Function
+fn_single_line = true
+fn_args_layout = "Compressed"
+
+# Imports
+reorder_imports = true
+imports_granularity = "Crate"
+imports_layout = "Vertical"
+imports_indent = "Block"
+group_imports = "StdExternalCrate"
+
 # Comments:
 normalize_comments = true
-wrap_comments = false
-comment_width = 90      # small excess is okay but prefer 80
+wrap_comments = true
+normalize_doc_attributes = true
+comment_width = 90
+report_todo = "Unnumbered"
+report_fixme = "Unnumbered"
 
-# Arguments:
-use_small_heuristics = "Default"
-# TODO: single line functions only where short, please?
-# https://github.com/rust-lang/rustfmt/issues/3358
-fn_single_line = false
-fn_args_layout = "Compressed"
+# Where Clauses
+where_single_line = false
+
+# Compatibility
+edition = "2018"
+
+# TODO
+use_field_init_shorthand = true
+
+# General
+max_width = 50
+use_small_heuristics = "Off"
 overflow_delimited_expr = true
-where_single_line = true
+blank_lines_upper_bound = 2
+
+# Ignored
+ignore = []
 
 # enum_discrim_align_threshold = 20
 # struct_field_align_threshold = 20
-
-# Compatibility:
-edition = "2018"        # we require compatibility back to 1.32.0
-
-# Misc:
-inline_attribute_width = 80
-blank_lines_upper_bound = 2
-reorder_impl_items = true
-# report_todo = "Unnumbered"
-# report_fixme = "Unnumbered"
-
-# Ignored files:
-ignore = []
