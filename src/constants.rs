@@ -12,11 +12,11 @@
 //! with the Maestro, can be found in the Pololu Micro-Maestro manual, located [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
 //! in section 5.e.
 
-/* external uses */
+// external uses
 
-/* internal mods */
+// internal mods
 
-/* internal uses */
+// internal uses
 
 pub(crate) const SYNC: u8 = 0xaau8;
 pub(crate) const DEVICE_NUMBER: u8 = 0x0cu8;
@@ -123,13 +123,14 @@ pub enum Errors {
 }
 
 impl From<u16> for Errors {
-
     /// Converts a raw `u16` into an `Errors` type.
     ///
     /// Given that the underlying `Errors` types are represented by `u16s`, the conversion should not
     /// result in any undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        return if (data >= (Errors::SER_SIGNAL_ERR as u16)) && (data <= (Errors::SCRIPT_PC_ERR as u16)) {
+        return if (data >= (Errors::SER_SIGNAL_ERR as u16))
+            && (data <= (Errors::SCRIPT_PC_ERR as u16))
+        {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()

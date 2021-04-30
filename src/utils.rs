@@ -5,16 +5,16 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/* external uses */
+// external uses
 
-/* internal mods */
+// internal mods
 #[cfg(test)]
 mod tests {
-    /* external uses */
+    // external uses
 
-    /* internal mods */
+    // internal mods
 
-    /* internal uses */
+    // internal uses
     use super::*;
 
     #[test]
@@ -50,7 +50,7 @@ mod tests {
     }
 }
 
-/* internal uses */
+// internal uses
 
 /// Given a `u8`, clears the top bit by applying a mask to it.
 #[inline]

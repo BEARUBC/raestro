@@ -5,27 +5,17 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/* external uses */
+// external uses
+use rppal::{gpio::Error as GpioError, uart::Error as UartError};
 use std::{
     error::Error as StdError,
-    io::{
-        Error as IoError,
-        ErrorKind as IoErrorKind,
-    },
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-    },
-};
-use rppal::{
-    uart::Error as UartError,
-    gpio::Error as GpioError,
+    fmt::{Display, Formatter, Result as FmtResult},
+    io::{Error as IoError, ErrorKind as IoErrorKind},
 };
 
-/* internal mods */
+// internal mods
 
-/* internal uses */
+// internal uses
 
 /// The custom `raestro` error type.
 ///
@@ -34,7 +24,6 @@ use rppal::{
 /// and then wrapped in the `Error::Io` variant.
 #[derive(Debug)]
 pub enum Error {
-
     /// The `maestro` instance is in an `uninitialized` state.
     ///
     /// Consider calling `Maestro::start` with a corresponding baudrate to transition this instance
@@ -58,7 +47,7 @@ pub enum Error {
     FaultyWrite {
         #[allow(missing_docs)]
         actual_count: usize,
-        
+
         #[allow(missing_docs)]
         expected_count: usize,
     },
@@ -69,11 +58,9 @@ pub enum Error {
 
 #[doc(hidden)]
 impl Error {
-
     /// Constructs a `std::io::Error` from the given parameters
     pub(crate) fn new_io_error<E>(err_kind: IoErrorKind, err_msg: E) -> Self
-    where
-    E: Into<Box<dyn StdError + Send + Sync>>, {
+    where E: Into<Box<dyn StdError + Send + Sync>> {
         return Error::Io(IoError::new(err_kind, err_msg));
     }
 }
@@ -81,7 +68,6 @@ impl Error {
 impl StdError for Error {}
 
 impl Display for Error {
-
     /// Formatting for `raestro::Error`.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         return match self {
@@ -95,7 +81,6 @@ impl Display for Error {
 }
 
 impl From<IoError> for Error {
-
     /// Wraps a `std::io::Error` in the `raestro::Error::Io` variant.
     fn from(io_error: IoError) -> Self {
         return Self::Io(io_error);
@@ -103,15 +88,20 @@ impl From<IoError> for Error {
 }
 
 impl From<UartError> for Error {
-
     /// Used to convert from an `rppal::uart::Error` type into the `raestro::Error`.
     fn from(uart_error: UartError) -> Self {
         return match uart_error {
             UartError::Io(std_err) => Error::from(std_err),
             UartError::Gpio(gpio_err) => match gpio_err {
                 GpioError::UnknownModel => Error::new_io_error(IoErrorKind::Other, "unknown model"),
-                GpioError::PinNotAvailable(pin) => Error::new_io_error(IoErrorKind::AddrNotAvailable, format!("pin number {} is not available", pin)),
-                GpioError::PermissionDenied(err_string) => Error::new_io_error(IoErrorKind::PermissionDenied, format!("permission denied: {} ", err_string)),
+                GpioError::PinNotAvailable(pin) => Error::new_io_error(
+                    IoErrorKind::AddrNotAvailable,
+                    format!("pin number {} is not available", pin),
+                ),
+                GpioError::PermissionDenied(err_string) => Error::new_io_error(
+                    IoErrorKind::PermissionDenied,
+                    format!("permission denied: {} ", err_string),
+                ),
                 GpioError::Io(error) => Error::from(error),
                 GpioError::ThreadPanic => Error::new_io_error(IoErrorKind::Other, "thread panic"),
             },

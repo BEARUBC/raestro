@@ -51,44 +51,41 @@
 //!
 //! let mut m: Maestro = Maestro::new();
 //! m.start(BaudRates::BR_115200).unwrap();
-//! 
+//!
 //! let channel: Channels = Channels::C_0;
-//! 
+//!
 //! let pos_min = 992u16;
 //! let pos_max = 2000u16;
-//! 
+//!
 //! let sleep_time = Duration::from_millis(1000u64);
-//! 
+//!
 //! loop {
 //!     maestro.set_target(channel, pos_min).unwrap();
 //!     thread::sleep(sleep_time);
-//! 
+//!
 //!     maestro.set_target(channel, pos_max).unwrap();
 //!     thread::sleep(sleep_time);
 //! }
 //! ```
 
-/* external crates */
+// external crates
 
-/* external uses */
+// external uses
 
-/* internal mods */
+// internal mods
 pub mod constants;
+mod errors;
 mod maestro;
 pub mod prelude;
-mod errors;
 mod utils;
 #[cfg(test)]
 mod tests {
-    /* external uses */
+    // external uses
 
-    /* internal mods */
+    // internal mods
 
-    /* internal uses */
-    use crate::{
-        maestro::*,
-        constants::*,
-    };
+    // internal uses
+    use crate::{constants::*, maestro::*};
 
     #[test]
     fn init_and_close() -> () {
@@ -98,6 +95,6 @@ mod tests {
     }
 }
 
-/* internal uses */
-pub use maestro::*;
+// internal uses
 pub use errors::*;
+pub use maestro::*;

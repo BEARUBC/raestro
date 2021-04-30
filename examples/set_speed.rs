@@ -5,18 +5,15 @@
 // This file may not be copied, modified, or distributed
 // except according to those terms.
 
-/* external crates */
+// external crates
 
-/* external uses */
-use std::{
-    thread,
-    time::Duration,
-};
+// external uses
 use raestro::prelude::*;
+use std::{thread, time::Duration};
 
-/* internal mods */
+// internal mods
 
-/* internal uses */
+// internal uses
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
