@@ -5,7 +5,7 @@ authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.
 edition = "2018"
 license = "MIT"
 description = "A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board. Developed for the Raspberry Pi"
-repository = "https://github.com/raunakab/raestro"
+repository = "https://github.com/BEARUBC/raestro"
 keywords = ["pololu", "maestro", "6-channel", "servo-controller", "raspberry-pi"]
 readme = "README.md"
 
