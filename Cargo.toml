@@ -51,7 +51,19 @@ crate-type = ["bin"]        # The crate types to generate.
 required-features = []      # Features required to build this target (N/A for lib).
 
 [[example]]
-name = "set_speed"    # The name of the target.
+name = "set_speed"     # The name of the target.
+test = true            # Is tested by default.
+doctest = false        # Documentation examples are tested by default.
+bench = true           # Is benchmarked by default.
+doc = false            # Is documented by default.
+proc-macro = false     # Set to `true` for a proc-macro library.
+harness = true         # Use libtest harness.
+edition = "2018"       # The edition of the target.
+crate-type = ["bin"]   # The crate types to generate.
+required-features = [] # Features required to build this target (N/A for lib).
+
+[[example]]
+name = "stop_script"   # The name of the target.
 test = true            # Is tested by default.
 doctest = false        # Documentation examples are tested by default.
 bench = true           # Is benchmarked by default.
