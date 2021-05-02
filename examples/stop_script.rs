@@ -23,24 +23,20 @@ fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
     maestro.start(BaudRates::BR_115200).unwrap();
 
-    let channel0: Channels = Channels::C_0;
-    let channel1: Channels = Channels::C_1;
-    let channel2: Channels = Channels::C_2;
+    let channel: Channels = Channels::C_0;
 
-    let pos_min = 992u16;
-    let pos_max = 2000u16;
+    let pos0 = 992u16;
+    let pos1 = 2000u16;
 
     let sleep_time = Duration::from_millis(1000u64);
 
     loop {
-        maestro.set_target(channel0, pos_min).unwrap();
-        maestro.set_target(channel1, pos_min).unwrap();
-        maestro.set_target(channel2, pos_min).unwrap();
+        maestro.set_target(channel, pos0).unwrap();
+        maestro.stop_script().unwrap();
         thread::sleep(sleep_time);
 
-        maestro.set_target(channel0, pos_max).unwrap();
-        maestro.set_target(channel1, pos_max).unwrap();
-        maestro.set_target(channel2, pos_max).unwrap();
+        maestro.set_target(channel, pos1).unwrap();
+        maestro.stop_script().unwrap();
         thread::sleep(sleep_time);
     }
 }
