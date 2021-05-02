@@ -2,21 +2,22 @@
 //
 // Licensed under the MIT license
 // <LICENSE.md or https://opensource.org/licenses/MIT>.
-// This file may not be copied, modified, or distributed
-// except according to those terms.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
 
-/* external crates */
+// external crates
 
-/* external uses */
+// external uses
 use std::{
     thread,
     time::Duration,
 };
+
 use raestro::prelude::*;
 
-/* internal mods */
+// internal mods
 
-/* internal uses */
+// internal uses
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
