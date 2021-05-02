@@ -49,7 +49,7 @@ pub const MAX_PWM: u16 = 2000u16;
 /// Review existing docs for this enum and add
 /// more iff necessary.
 #[allow(non_camel_case_types, unused)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub(crate) enum CommandFlags {
     SET_TARGET = 0x84u8,
@@ -70,7 +70,7 @@ pub(crate) enum CommandFlags {
 /// Review existing docs for this enum and add
 /// more iff necessary.
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum Channels {
     #[allow(missing_docs)]
@@ -104,7 +104,7 @@ pub enum Channels {
 /// Review existing docs for this enum and add
 /// more iff necessary.
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
 pub enum BaudRates {
     #[allow(missing_docs)]
@@ -121,12 +121,6 @@ pub enum BaudRates {
 /// from section 4.e of the Pololu Micro Maestro
 /// manual, which can be found
 /// [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
-///
-/// # TODO
-/// Review existing docs for this enum and add
-/// more iff necessary.
-///
-/// ADD DOCUMENTATION FOR ALL VARIANTS DOWN BELOW!
 #[allow(non_camel_case_types)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u16)]
