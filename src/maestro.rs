@@ -208,13 +208,15 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let microsec: u16 = 1234u16; // can be any value between 992u16 and 2000u16
+    /// let microsec = 1234u16; // can be any value between 992u16 and 2000u16
     ///
-    /// m.set_target(channel, microsec);
+    /// m.set_target(channel, microsec).unwrap();
     /// ```
     pub fn set_target(&mut self, channel: Channels, microsec: u16) -> Result<()> {
         return if MIN_PWM <= microsec && microsec <= MAX_PWM {
@@ -233,13 +235,15 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let speed: u16 = 10u16;
+    /// let speed = 10u16;
     ///
-    /// m.set_speed(channel, speed);
+    /// m.set_speed(channel, speed).unwrap();
     /// ```
     ///
     /// # TODO
@@ -259,13 +263,15 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let acceleration: u16 = 10u16;
+    /// let acceleration = 10u8;
     ///
-    /// m.set_acceleration(channel, acceleration);
+    /// m.set_acceleration(channel, acceleration).unwrap();
     /// ```
     ///
     /// # TODO:
@@ -287,10 +293,12 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// m.go_home();
+    /// m.go_home().unwrap();
     /// ```
     pub fn go_home(self: &mut Self) -> Result<()> {
         return self.write_command(CommandFlags::GO_HOME);
@@ -301,10 +309,12 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// m.stop_script();
+    /// m.stop_script().unwrap();
     /// ```
     ///
     /// # TODO
@@ -351,12 +361,14 @@ impl Maestro {
     /// additional hardware.
     ///
     /// # Example Usage
-    /// ```
+    /// ```ignore
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let position: u16 = 1234u16; // can be any value between 992u16 and 2000u16
+    /// let position = 1234u16; // can be any value between 992u16 and 2000u16
     ///
     /// m.set_target(channel, position);
     ///
@@ -385,7 +397,9 @@ impl Maestro {
     /// additional hardware to implement it.
     ///
     /// # Example Usage
-    /// ```
+    /// ```ignore
+    /// use raestro::prelude::*;
+    ///
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
@@ -405,7 +419,7 @@ impl Maestro {
 /// All hidden from public documentation.
 ///
 /// Provide basic utilities and abstracted
-/// functionality to the rest of the program
+/// functionality to the rest of the program.
 ///
 /// Please note that all methods in this `impl`
 /// block operate on the assumption that
