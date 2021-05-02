@@ -1,10 +1,10 @@
-# Raestro - A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board
+# `raestro` - A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board
 [![Build Status](https://travis-ci.com/raunakab/raestro.svg?branch=master)](https://travis-ci.com/github/raunakab/raestro)
 [![crates.io](https://meritbadge.herokuapp.com/raestro)](https://crates.io/crates/raestro)
 [![docs](https://docs.rs/raestro/badge.svg)](https://docs.rs/crate/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-Raestro is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
+`raestro` is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
 
 ## Table of Contents
 - [Prelude](#Prelude)
@@ -19,39 +19,40 @@ Raestro is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.co
 This library is developed specifically for the Raspberry Pi, which acts as the main computer system on our bionic arm. Builds on different architectures will not be guaranteed to work.
 
 ## Documentation
-As of current, documentation for this library and all of its APIs is still being worked on. However, design decisions on Raestro are now finally starting to stabilize, and as such, documentation will soon be available as part of the next incremental release.
+All public exports have been properly documented with examples for usage of critical APIs.
+A complete version of the documentation can be found [here](https://docs.rs/raestro).
+Included below is a minimal example of how to setup your environment and build a project using `raestro`.
 
 ## Getting Started
 
 ### Hardware Setup
-1. Connect the power+ground lines from the RPi to the Maestro.
-2. Connect the RPI's TX and RX pins to the Maestro's RX and TX pins, respectively. Please note the order in which the pins need to be connected (RPi TX connected to Maestro RX; RPi RX connected to Maestro TX).
-3. Connect the power lines for the servos (holding the board such that the pins are facing you and are on the right side of the board,these are the 2 pins on the top right). The left one of the pair is the power; the right one is ground.
-4. Connect up to 6 servos on one of the pin-triples available (the backside of the board has more info on each pin-type).
+1. Connect the power and ground lines from the Raspberry Pi to the Maestro.
+2. Connect the Raspberry Pi's TX and RX pins to the Maestro's RX and TX pins, respectively. Please note the order in which the pins need to be connected (the Pi's TX connected to the Maestro's RX and the Pi's RX connected to the Maestro's TX).
+3. Connect the power lines for the servos. Documentation on which line is which is available readily online.
+4. Connect up to 6 servos to one of the pin-triples available (the backside of the board has more info on each pin-type).
 
 ### Software Setup
-The Rust crate "rppal" provides user-level APIs for protocols such as PWM, I2C, and UART.
-In order to configure UART for the Raspberry Pi, do the following:
-1. Remove "console=serial0,11520" from /boot/cmdline.txt
+The Rust crate `rppal` provides user-level APIs for protocols such as `PWM`, `I2C`, and `UART`.
+In order to configure `UART` for the Raspberry Pi, do the following:
+1. Remove `console=serial0,11520` from `/boot/cmdline.txt`
 2. Disable the Bluetooth by:
-	* Adding "dtoverlay=pi3-disable-bt" to /boot/config.txt (without the quotation marks)
-		* For the RPi4 models, add "dtoverlay=disable-bt" instead
-		* Once this is done, reboot the Pi (by powering it off and then on again)
-		* Connecting GPIO Pin-14 (physical pin 08) to an LED, this LED should be LIT
-	* Running the command "sudo systemctl disable hciuart"
+	* Adding `dtoverlay=pi3-disable-bt` to `/boot/config.txt`
+		* For the RPi4 models, do this by adding `dtoverlay=disable-bt` instead
+		* Rebooting the Pi (by powering it off and then on again)
+	* Running the command `sudo systemctl disable hciuart`
 
 ### Trouble-shooting
-If "cargo build" or "cargo test" do not work because of the rppal dependency, check the rppal documentations on how to set up UART.
+If `cargo build` or `cargo test` do not work because of the `rppal` dependency, check the `rppal` documentations on how to set up `UART`.
 The link is [here](https://docs.rs/rppal/0.11.3/rppal/uart/index.html).
 
 ## Usage
-Add the following to your Cargo.toml file:
+Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 raestro = "0.2.0"
 ```
-In the main function, create a new Maestro instance and initialize it by calling start.
-This initialized struct can now be utilized to perform writes and reads to and from the Maestro.
+Create a new `maestro` instance and initialize it by calling `Maestro::start`.
+This initialized struct can now be utilized to perform reads and writes to and from the Micro-Maestro 6-Channel.
 ```rust
 use raestro::prelude::*;
 
@@ -72,4 +73,4 @@ fn main() -> () {
 	assert_eq!(position, actual_position);
 }
 ```
-More examples of API usage are provided in the examples folder.
+More examples of API usage are provided in the `examples` folder.
