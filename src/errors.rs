@@ -5,7 +5,6 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-// external uses
 use std::{
     error::Error as StdError,
     fmt::{
@@ -23,10 +22,6 @@ use rppal::{
     gpio::Error as GpioError,
     uart::Error as UartError,
 };
-
-// internal mods
-
-// internal uses
 
 /// The custom `raestro` error type.
 ///
@@ -85,15 +80,11 @@ pub enum Error {
 impl Error {
     /// Constructs a `std::io::Error` from the
     /// given parameters
-    pub(crate) fn new_io_error<E>(
-        err_kind: IoErrorKind, err_msg: E,
-    ) -> Self
+    pub(crate) fn new_io_error<E>(err_kind: IoErrorKind, err_msg: E) -> Self
     where
         E: Into<Box<dyn StdError + Send + Sync>>,
     {
-        return Error::Io(IoError::new(
-            err_kind, err_msg,
-        ));
+        return Error::Io(IoError::new(err_kind, err_msg));
     }
 }
 
@@ -101,9 +92,7 @@ impl StdError for Error {}
 
 impl Display for Error {
     /// Formatting for `raestro::Error`.
-    fn fmt(
-        &self, f: &mut Formatter<'_>,
-    ) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         return match self {
             Error::Uninitialized => write!(f, "maestro struct is uninitialized; please consider calling .start() on the instance first"),
             Error::InvalidValue(value) => write!(f, "microsec values must be between 992us and 2000us but {}us was used", value),
@@ -117,9 +106,7 @@ impl Display for Error {
 impl From<IoError> for Error {
     /// Wraps a `std::io::Error` in the
     /// `raestro::Error::Io` variant.
-    fn from(io_error: IoError) -> Self {
-        return Self::Io(io_error);
-    }
+    fn from(io_error: IoError) -> Self { return Self::Io(io_error); }
 }
 
 impl From<UartError> for Error {
@@ -128,23 +115,21 @@ impl From<UartError> for Error {
     /// `raestro::Error`.
     fn from(uart_error: UartError) -> Self {
         return match uart_error {
-            UartError::Io(std_err,) => Error::from(std_err,),
-            UartError::Gpio(gpio_err,) => match gpio_err {
-                GpioError::UnknownModel => {
-                    Error::new_io_error(IoErrorKind::Other, "unknown model",)
-                }
-                GpioError::PinNotAvailable(pin,) => Error::new_io_error(
+            UartError::Io(std_err) => Error::from(std_err),
+            UartError::Gpio(gpio_err) => match gpio_err {
+                GpioError::UnknownModel => Error::new_io_error(IoErrorKind::Other, "unknown model"),
+                GpioError::PinNotAvailable(pin) => Error::new_io_error(
                     IoErrorKind::AddrNotAvailable,
                     format!("pin number {} is not available", pin),
                 ),
-                GpioError::PermissionDenied(err_string,) => Error::new_io_error(
+                GpioError::PermissionDenied(err_string) => Error::new_io_error(
                     IoErrorKind::PermissionDenied,
                     format!("permission denied: {} ", err_string),
                 ),
-                GpioError::Io(error,) => Error::from(error,),
-                GpioError::ThreadPanic => Error::new_io_error(IoErrorKind::Other, "thread panic",),
+                GpioError::Io(error) => Error::from(error),
+                GpioError::ThreadPanic => Error::new_io_error(IoErrorKind::Other, "thread panic"),
             },
-            UartError::InvalidValue => Error::new_io_error(IoErrorKind::Other, "invalid value",),
+            UartError::InvalidValue => Error::new_io_error(IoErrorKind::Other, "invalid value"),
         };
     }
 }

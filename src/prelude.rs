@@ -10,11 +10,6 @@
 //! Encapsulates all modules required for general
 //! usage of the `raestro` library.
 
-// external uses
-
-// internal mods
-
-// internal uses
 pub use crate::{
     constants::*,
     errors::*,

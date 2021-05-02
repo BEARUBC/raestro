@@ -103,11 +103,6 @@
 //! }
 //! ```
 
-// external crates
-
-// external uses
-
-// internal mods
 pub mod constants;
 mod errors;
 mod maestro;
@@ -128,9 +123,7 @@ mod tests {
     #[test]
     fn init_and_close() -> () {
         let mut maestro: Maestro = Maestro::new();
-        maestro
-            .start(BaudRates::BR_115200)
-            .unwrap();
+        maestro.start(BaudRates::BR_115200).unwrap();
         maestro.close();
     }
 }

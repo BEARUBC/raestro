@@ -29,7 +29,8 @@ match_block_trailing_comma = true
 # Function
 fn_single_line = true
 fn_args_layout = "Tall"
-fn_call_width = 60
+# fn_call_width = 60
+force_multiline_blocks = false
 
 # Imports
 reorder_imports = true
@@ -42,9 +43,9 @@ group_imports = "StdExternalCrate"
 normalize_comments = true
 wrap_comments = true
 normalize_doc_attributes = true
-comment_width = 90
-report_todo = "Unnumbered"
-report_fixme = "Unnumbered"
+comment_width = 50
+# report_todo = "Unnumbered"
+# report_fixme = "Unnumbered"
 
 # Where Clauses
 where_single_line = false

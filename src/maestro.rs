@@ -9,6 +9,7 @@ use std::{
     boxed::Box,
     result::Result as StdResult,
     time::Duration,
+    vec::Vec,
 };
 
 use rppal::uart::{
@@ -29,8 +30,7 @@ use crate::{
 /// raestro::error::Error>`.
 pub type Result<T> = StdResult<T, Error>;
 
-const DEFAULT_BLOCKING_DURATION: Duration =
-    Duration::from_secs(2u64);
+const DEFAULT_BLOCKING_DURATION: Duration = Duration::from_secs(2u64);
 const BUFFER_SIZE: usize = 6usize;
 
 /// The main wrapper around the Maestro
@@ -103,43 +103,25 @@ impl Maestro {
     /// `uninitialized` state. This is done to
     /// prevent any leakage of `maestro` instances
     /// into the `invalid` state.
-    pub fn start(
-        self: &mut Self, baud_rate: BaudRates,
-    ) -> Result<()> {
+    pub fn start(self: &mut Self, baud_rate: BaudRates) -> Result<()> {
         let uart_result: RppalResult<Uart> =
-            Uart::new(
-                baud_rate as u32,
-                Parity::None,
-                DATA_BITS,
-                STOP_BITS,
-            );
+            Uart::new(baud_rate as u32, Parity::None, DATA_BITS, STOP_BITS);
 
         return uart_result
             .and_then(|uart| {
                 self.uart = Some(Box::new(uart));
-                self.read_buf = Some(Box::new(
-                    [0u8; BUFFER_SIZE],
-                ));
-                self.write_buf = Some(Box::new(
-                    [0u8; BUFFER_SIZE],
-                ));
+                self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
+                self.write_buf = Some(Box::new([0u8; BUFFER_SIZE]));
 
                 return self
                     .uart
                     .as_mut()
                     .unwrap()
                     .as_mut()
-                    .set_read_mode(
-                        RESPONSE_SIZE,
-                        DEFAULT_BLOCKING_DURATION,
-                    );
+                    .set_read_mode(RESPONSE_SIZE, DEFAULT_BLOCKING_DURATION);
             })
             .map(|()| {
-                let buf = self
-                    .write_buf
-                    .as_mut()
-                    .unwrap()
-                    .as_mut();
+                let buf = self.write_buf.as_mut().unwrap().as_mut();
 
                 buf[0usize] = SYNC as u8;
                 buf[1usize] = DEVICE_NUMBER as u8;
@@ -159,7 +141,7 @@ impl Maestro {
     /// This instance is no longer usable to
     /// communicate with the Maestro, unless
     /// until `Maestro::start()` is called again.
-    pub fn close(self: &mut Self) -> () {
+    pub fn close(&mut self) -> () {
         self.uart = None;
         self.read_buf = None;
         self.write_buf = None;
@@ -186,22 +168,14 @@ impl Maestro {
     /// Returns an error if the `maestro` instance
     /// has not been initialized by calling
     /// `Maestro::start()`.
-    pub fn set_block_duration(
-        self: &mut Self, duration: Duration,
-    ) -> Result<()> {
+    pub fn set_block_duration(&mut self, duration: Duration) -> Result<()> {
         return self
             .uart
             .as_mut()
             .ok_or(Error::Uninitialized)
             .and_then(|uart| {
-                return uart
-                    .set_read_mode(
-                        RESPONSE_SIZE,
-                        duration,
-                    )
-                    .map_err(|rppal_err| {
-                        Error::from(rppal_err)
-                    });
+                uart.set_read_mode(RESPONSE_SIZE, duration)
+                    .map_err(|rppal_err| Error::from(rppal_err))
             });
     }
 }
@@ -214,7 +188,10 @@ impl Maestro {
 /// For interacting with the Pololu, the official
 /// "Pololu-Protocol" is being utilized.
 ///
-/// More information on the Pololu-Protocol can be found at the official Pololu Micro Maestro documentation pages, available [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
+/// More information on the Pololu-Protocol can be
+/// found at the official Pololu Micro Maestro
+/// documentation pages, available
+/// [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
 /// Information on the available serial commands,
 /// as well as the specific protocols officially
 /// supported (for each type of Maestro), is
@@ -239,23 +216,14 @@ impl Maestro {
     ///
     /// m.set_target(channel, microsec);
     /// ```
-    pub fn set_target(
-        self: &mut Self, channel: Channels,
-        microsec: u16,
-    ) -> Result<()> {
-        return if MIN_PWM <= microsec
-            && microsec <= MAX_PWM
-        {
+    pub fn set_target(&mut self, channel: Channels, microsec: u16) -> Result<()> {
+        return if MIN_PWM <= microsec && microsec <= MAX_PWM {
             Ok(microsec << DATA_MULTIPLIER)
         } else {
             Err(Error::InvalidValue(microsec))
         }
         .and_then(move |payload| {
-            self.write_channel_and_payload(
-                CommandFlags::SET_TARGET,
-                channel,
-                payload,
-            )
+            self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, payload)
         });
     }
 
@@ -276,15 +244,8 @@ impl Maestro {
     ///
     /// # TODO
     /// Search up the max speed value allowable.
-    pub fn set_speed(
-        self: &mut Self, channel: Channels,
-        speed: u16,
-    ) -> Result<()> {
-        return self.write_channel_and_payload(
-            CommandFlags::SET_SPEED,
-            channel,
-            speed,
-        );
+    pub fn set_speed(&mut self, channel: Channels, speed: u16) -> Result<()> {
+        return self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed);
     }
 
     /// Sets the rotational acceleration of the
@@ -311,14 +272,11 @@ impl Maestro {
     /// Check if the Maestro actually rejects the
     /// request or just doesn't move if `0u8`
     /// is sent as the acceleration.
-    pub fn set_acceleration(
-        self: &mut Self, channel: Channels,
-        acceleration: u8,
-    ) -> Result<()> {
+    pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
         return self.write_channel_and_payload(
             CommandFlags::SET_ACCELERATION,
             channel,
-            acceleration.into(),
+            acceleration as u16,
         );
     }
 
@@ -334,12 +292,8 @@ impl Maestro {
     ///
     /// m.go_home();
     /// ```
-    pub fn go_home(
-        self: &mut Self,
-    ) -> Result<()> {
-        return self.write_command(
-            CommandFlags::GO_HOME,
-        );
+    pub fn go_home(self: &mut Self) -> Result<()> {
+        return self.write_command(CommandFlags::GO_HOME);
     }
 
     /// Stops all requested actions sent to the
@@ -356,12 +310,8 @@ impl Maestro {
     /// # TODO
     /// Find out how the Maestro implements
     /// `stop_script`.
-    pub fn stop_script(
-        self: &mut Self,
-    ) -> Result<()> {
-        return self.write_command(
-            CommandFlags::STOP_SCRIPT,
-        );
+    pub fn stop_script(self: &mut Self) -> Result<()> {
+        return self.write_command(CommandFlags::STOP_SCRIPT);
     }
 
     /// Gets the `PWM` signal being broadcasted to
@@ -414,19 +364,12 @@ impl Maestro {
     ///
     /// assert_eq!(position, actual_position);
     /// ```
-    pub fn get_position(
-        self: &mut Self, channel: Channels,
-    ) -> Result<u16> {
-        let write_result = self.write_channel(
-            CommandFlags::GET_POSITION,
-            channel,
-        );
+    pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
+        let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
         return self
             .read_after_writing(write_result)
-            .map(move |result| {
-                result >> DATA_MULTIPLIER
-            });
+            .map(move |result| result >> DATA_MULTIPLIER);
     }
 
     /// Gets any errors encountered by the Maestro
@@ -448,16 +391,12 @@ impl Maestro {
     ///
     /// let errors = m.get_errors().unwrap();
     /// ```
-    pub fn get_errors(
-        self: &mut Self,
-    ) -> Result<Errors> {
-        let write_result = self.write_command(
-            CommandFlags::GET_ERRORS,
-        );
+    pub fn get_errors(self: &mut Self) -> Result<Vec<Errors>> {
+        let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
         return self
             .read_after_writing(write_result)
-            .map(|data| Errors::from(data));
+            .map(|data| Errors::into_errors(data));
     }
 }
 
@@ -502,27 +441,19 @@ impl Maestro {
     /// * `self.uart` array is the `None` variant;
     ///   in this case, the `self` instance has
     ///   NOT been initialized.
-    fn read(
-        self: &mut Self, length: usize,
-    ) -> Result<()> {
+    fn read(self: &mut Self, length: usize) -> Result<()> {
         if length > BUFFER_SIZE {
             panic!();
         }
 
-        let slice = &mut self
-            .read_buf
-            .as_mut()
-            .unwrap()
-            .as_mut()[0usize..length];
+        let slice = &mut self.read_buf.as_mut().unwrap().as_mut()[0usize..length];
 
         return self
             .uart
             .as_mut()
             .unwrap()
             .read(slice)
-            .map_err(|rppal_err| {
-                Error::from(rppal_err)
-            })
+            .map_err(|rppal_err| Error::from(rppal_err))
             .and_then(|bytes_read| {
                 if bytes_read == length {
                     Ok(())
@@ -555,36 +486,25 @@ impl Maestro {
     /// * `self.uart` array is the `None` variant;
     ///   in this case, the `self` instance has
     ///   NOT been initialized.
-    fn write(
-        self: &mut Self, length: usize,
-    ) -> Result<()> {
-        if (length < MIN_WRITE_LENGTH)
-            || (length > BUFFER_SIZE)
-        {
+    fn write(self: &mut Self, length: usize) -> Result<()> {
+        if (length < MIN_WRITE_LENGTH) || (length > BUFFER_SIZE) {
             panic!();
         }
 
-        let slice = &self
-            .write_buf
-            .as_mut()
-            .unwrap()
-            .as_mut()[0usize..length];
+        let slice = &self.write_buf.as_mut().unwrap().as_mut()[0usize..length];
 
         return self
             .uart
             .as_mut()
             .unwrap()
             .write(slice)
-            .map_err(|rppal_err| {
-                Error::from(rppal_err)
-            })
+            .map_err(|rppal_err| Error::from(rppal_err))
             .and_then(|bytes_written| {
                 if bytes_written == length {
                     Ok(())
                 } else {
                     Err(Error::FaultyWrite {
-                        actual_count:
-                            bytes_written,
+                        actual_count: bytes_written,
                         expected_count: length,
                     })
                 }
@@ -609,20 +529,15 @@ impl Maestro {
     fn write_channel_and_payload(
         self: &mut Self,
         command_flag: CommandFlags,
-        channel: Channels, microsec: u16,
+        channel: Channels,
+        microsec: u16,
     ) -> Result<()> {
         let length_to_write = 6usize;
 
-        let command =
-            mask_byte(command_flag as u8);
-        let (lower, upper) =
-            microsec_to_target(microsec);
+        let command = mask_byte(command_flag as u8);
+        let (lower, upper) = microsec_to_target(microsec);
 
-        let buffer = self
-            .write_buf
-            .as_mut()
-            .unwrap()
-            .as_mut();
+        let buffer = self.write_buf.as_mut().unwrap().as_mut();
 
         buffer[2usize] = command;
         buffer[3usize] = channel as u8;
@@ -647,21 +562,12 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn write_channel(
-        self: &mut Self,
-        command_flag: CommandFlags,
-        channel: Channels,
-    ) -> Result<()> {
+    fn write_channel(self: &mut Self, command_flag: CommandFlags, channel: Channels) -> Result<()> {
         let length_to_write = 4usize;
 
-        let command =
-            mask_byte(command_flag as u8);
+        let command = mask_byte(command_flag as u8);
 
-        let buffer = self
-            .write_buf
-            .as_mut()
-            .unwrap()
-            .as_mut();
+        let buffer = self.write_buf.as_mut().unwrap().as_mut();
 
         buffer[2usize] = command;
         buffer[3usize] = channel as u8;
@@ -684,20 +590,12 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn write_command(
-        self: &mut Self,
-        command_flag: CommandFlags,
-    ) -> Result<()> {
+    fn write_command(self: &mut Self, command_flag: CommandFlags) -> Result<()> {
         let length_to_write = 3usize;
 
-        let command =
-            mask_byte(command_flag as u8);
+        let command = mask_byte(command_flag as u8);
 
-        let buffer = self
-            .write_buf
-            .as_mut()
-            .unwrap()
-            .as_mut();
+        let buffer = self.write_buf.as_mut().unwrap().as_mut();
 
         buffer[2usize] = command;
 
@@ -715,18 +613,10 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn prepare_data_from_buffer(
-        self: &mut Self,
-    ) -> u16 {
-        let buf = self
-            .read_buf
-            .as_mut()
-            .unwrap()
-            .as_mut();
+    fn prepare_data_from_buffer(self: &mut Self) -> u16 {
+        let buf = self.read_buf.as_mut().unwrap().as_mut();
 
-        let data: u16 = ((buf[1usize] as u16)
-            << 8usize)
-            | (buf[0usize] as u16);
+        let data: u16 = ((buf[1usize] as u16) << 8usize) | (buf[0usize] as u16);
 
         return data;
     }
@@ -741,15 +631,9 @@ impl Maestro {
     /// `write`, and then immediately a
     /// `read_after_writing`. Therefore, for those
     /// types of situations, use this method.
-    fn read_after_writing(
-        self: &mut Self, write_result: Result<()>,
-    ) -> Result<u16> {
+    fn read_after_writing(self: &mut Self, write_result: Result<()>) -> Result<u16> {
         return write_result
-            .and_then(|()| {
-                self.read(RESPONSE_SIZE as usize)
-            })
-            .map(|()| {
-                self.prepare_data_from_buffer()
-            });
+            .and_then(|()| self.read(RESPONSE_SIZE as usize))
+            .map(|()| self.prepare_data_from_buffer());
     }
 }
