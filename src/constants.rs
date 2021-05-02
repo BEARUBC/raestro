@@ -10,7 +10,10 @@
 //! Pololu-Protocol.
 //!
 //! The specifics on the Pololu-Protoco, as well
-//! as the overall serial communication with the Maestro, can be found in the Pololu Micro-Maestro manual, located [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
+//! as the overall serial communication with the
+//! Maestro, can be found in the Pololu
+//! Micro-Maestro manual, located
+//! [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf)
 //! in section 5.e.
 
 use std::vec::Vec;
