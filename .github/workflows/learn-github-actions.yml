@@ -1,0 +1,6 @@
+name: learn-github-actions
+on: [ push ]
+jobs:
+        check-bats-version:
+                runs-on: raspberrypi
+                steps:
