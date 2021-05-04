@@ -44,5 +44,5 @@ jobs:
       - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
-          command: fmt +nightly
+          command: fmt
           args: --all -- --check
