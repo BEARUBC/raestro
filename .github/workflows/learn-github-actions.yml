@@ -5,3 +5,5 @@ jobs:
                 runs-on: self-hosted
                 steps:
                         - run: cargo install cross
+                        - run: cross build --all-features --target armv7-unknown-linux-gnueabihf
+                        - run: cross build --all-features --target armv7-unknown-linux-gnueabihf --release
