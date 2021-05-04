@@ -1,9 +1,9 @@
 on: [push, pull_request]
 
-name: Continuous integration
+name: Raestro CI
 
 jobs:
-  check:
+  job1:
     name: Check
     runs-on: self-hosted
     steps:
@@ -17,8 +17,8 @@ jobs:
         with:
           command: check
 
-  test:
-    name: Test Suite
+  job2:
+    name: Test
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
@@ -31,34 +31,18 @@ jobs:
         with:
           command: test
 
-  fmt:
-    name: Rustfmt
+  job3:
+    name: Nightly Format
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: nightly
           override: true
       - run: rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
-          command: fmt
+          command: fmt +nightly
           args: --all -- --check
-
-  clippy:
-    name: Clippy
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - run: rustup component add clippy
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
