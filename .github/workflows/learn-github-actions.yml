@@ -1,6 +1,7 @@
 name: learn-github-actions
 on: [ push ]
 jobs:
-        runs-on: self-hosted
-        steps:
-                - run: cargo install cross
+        test-job:
+                runs-on: self-hosted
+                steps:
+                        - run: cargo install cross
