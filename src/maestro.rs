@@ -216,7 +216,7 @@ impl Maestro {
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
     /// let microsec = 1234u16; // can be any value between 992u16 and 2000u16
     ///
-    /// m.set_target(channel, microsec).unwrap();
+    /// m.set_target(channel, microsec);
     /// ```
     pub fn set_target(&mut self, channel: Channels, microsec: u16) -> Result<()> {
         return if MIN_PWM <= microsec && microsec <= MAX_PWM {
@@ -243,7 +243,7 @@ impl Maestro {
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
     /// let speed = 10u16;
     ///
-    /// m.set_speed(channel, speed).unwrap();
+    /// m.set_speed(channel, speed);
     /// ```
     ///
     /// # TODO
@@ -271,7 +271,7 @@ impl Maestro {
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
     /// let acceleration = 10u8;
     ///
-    /// m.set_acceleration(channel, acceleration).unwrap();
+    /// m.set_acceleration(channel, acceleration);
     /// ```
     ///
     /// # TODO:
@@ -298,7 +298,7 @@ impl Maestro {
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// m.go_home().unwrap();
+    /// m.go_home();
     /// ```
     pub fn go_home(self: &mut Self) -> Result<()> {
         return self.write_command(CommandFlags::GO_HOME);
@@ -314,7 +314,7 @@ impl Maestro {
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// m.stop_script().unwrap();
+    /// m.stop_script();
     /// ```
     ///
     /// # TODO
