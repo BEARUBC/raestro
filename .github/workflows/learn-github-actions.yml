@@ -4,3 +4,4 @@ jobs:
         check-bats-version:
                 runs-on: raspberrypi
                 steps:
+                        - run: cargo install cross
