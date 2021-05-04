@@ -1,5 +1,5 @@
 # `raestro` - A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board
-[![Build Status](https://travis-ci.com/raunakab/raestro.svg?branch=master)](https://travis-ci.com/github/raunakab/raestro)
+[![build\_status](https://github.com/raunakab/raestro/actions/workflows/main.yml/badge.svg)](https://github.com/raunakab/raestro/actions/workflows/main.yml)
 [![crates.io](https://meritbadge.herokuapp.com/raestro)](https://crates.io/crates/raestro)
 [![docs](https://docs.rs/raestro/badge.svg)](https://docs.rs/crate/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
