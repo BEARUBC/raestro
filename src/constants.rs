@@ -48,7 +48,7 @@ pub const MAX_PWM: u16 = 2000u16;
 /// # TODO
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types, unused)]
+#[allow(non_camel_case_types, clippy::upper_case_acronym)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub(crate) enum CommandFlags {
@@ -59,8 +59,14 @@ pub(crate) enum CommandFlags {
     GET_ERRORS = 0xA1u8,
     GO_HOME = 0xA2u8,
     STOP_SCRIPT = 0xA4u8,
+
+    #[allow(unused)]
     RESTART_SCRIPT_AT_SUBROUTINE = 0xA7u8,
+
+    #[allow(unused)]
     RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER = 0xA8u8,
+
+    #[allow(unused)]
     GET_SCRIPT_STATUS = 0xAEu8,
 }
 
@@ -69,7 +75,7 @@ pub(crate) enum CommandFlags {
 /// # TODO
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, clippy::upper_case_acronym)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum Channels {
@@ -103,7 +109,7 @@ pub enum Channels {
 ///
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, clippy::upper_case_acronym)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
 pub enum BaudRates {
@@ -121,7 +127,7 @@ pub enum BaudRates {
 /// from section 4.e of the Pololu Micro Maestro
 /// manual, which can be found
 /// [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, clippy::upper_case_acronym)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u16)]
 pub enum Errors {
