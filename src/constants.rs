@@ -48,7 +48,7 @@ pub const MAX_PWM: u16 = 2000u16;
 /// # TODO
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types, clippy::upper_case_acronym)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub(crate) enum CommandFlags {
@@ -75,7 +75,7 @@ pub(crate) enum CommandFlags {
 /// # TODO
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types, clippy::upper_case_acronym)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum Channels {
@@ -109,7 +109,7 @@ pub enum Channels {
 ///
 /// Review existing docs for this enum and add
 /// more iff necessary.
-#[allow(non_camel_case_types, clippy::upper_case_acronym)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
 pub enum BaudRates {
@@ -127,7 +127,7 @@ pub enum BaudRates {
 /// from section 4.e of the Pololu Micro Maestro
 /// manual, which can be found
 /// [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
-#[allow(non_camel_case_types, clippy::upper_case_acronym)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u16)]
 pub enum Errors {
@@ -228,7 +228,7 @@ impl Errors {
     /// only the first 9 bits (bit 0 to bit 8) can
     /// be set in the `u16`. All other bits
     /// are ignored.
-    pub fn into_errors(mut data: u16) -> Vec<Errors> {
+    pub fn from_data(mut data: u16) -> Vec<Errors> {
         #[allow(unused)]
         const MASK: u16 = 0x0001u16;
 
@@ -255,9 +255,7 @@ impl From<u16> for Errors {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        if (data >= (Errors::SER_SIGNAL_ERR as u16))
-            && (data <= (Errors::SCRIPT_PC_ERR as u16))
-        {
+        if (data >= (Errors::SER_SIGNAL_ERR as u16)) && (data <= (Errors::SCRIPT_PC_ERR as u16)) {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()

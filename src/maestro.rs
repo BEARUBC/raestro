@@ -397,8 +397,7 @@ impl Maestro {
     pub fn get_errors(&mut self) -> Result<Vec<Errors>> {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
-        self.read_after_writing(write_result)
-            .map(Errors::into_errors)
+        self.read_after_writing(write_result).map(Errors::from_data)
     }
 }
 
@@ -639,7 +638,5 @@ impl Maestro {
 }
 
 impl Default for Maestro {
-    fn default() -> Self {
-        Maestro::new()
-    }
+    fn default() -> Self { Maestro::new() }
 }
