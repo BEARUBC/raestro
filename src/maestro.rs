@@ -113,8 +113,7 @@ impl Maestro {
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
                 self.write_buf = Some(Box::new([0u8; BUFFER_SIZE]));
 
-                self
-                    .uart
+                self.uart
                     .as_mut()
                     .unwrap()
                     .as_mut()
@@ -169,8 +168,7 @@ impl Maestro {
     /// has not been initialized by calling
     /// `Maestro::start()`.
     pub fn set_block_duration(&mut self, duration: Duration) -> Result<()> {
-        self
-            .uart
+        self.uart
             .as_mut()
             .ok_or(Error::Uninitialized)
             .and_then(|uart| {
@@ -279,11 +277,7 @@ impl Maestro {
     /// request or just doesn't move if `0u8`
     /// is sent as the acceleration.
     pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
-        self.write_channel_and_payload(
-            CommandFlags::SET_ACCELERATION,
-            channel,
-            acceleration as u16,
-        )
+        self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16)
     }
 
     /// Sends all servos to home position.
@@ -300,9 +294,7 @@ impl Maestro {
     ///
     /// m.go_home();
     /// ```
-    pub fn go_home(&mut self) -> Result<()> {
-        self.write_command(CommandFlags::GO_HOME)
-    }
+    pub fn go_home(&mut self) -> Result<()> { self.write_command(CommandFlags::GO_HOME) }
 
     /// Stops all requested actions sent to the
     /// Maestro to be stopped immediately.
@@ -320,9 +312,7 @@ impl Maestro {
     /// # TODO
     /// Find out how the Maestro implements
     /// `stop_script`.
-    pub fn stop_script(&mut self) -> Result<()> {
-        self.write_command(CommandFlags::STOP_SCRIPT)
-    }
+    pub fn stop_script(&mut self) -> Result<()> { self.write_command(CommandFlags::STOP_SCRIPT) }
 
     /// Gets the `PWM` signal being broadcasted to
     /// the servo at the given channel.
@@ -379,8 +369,7 @@ impl Maestro {
     pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
-        self
-            .read_after_writing(write_result)
+        self.read_after_writing(write_result)
             .map(move |result| result >> DATA_MULTIPLIER)
     }
 
@@ -408,8 +397,7 @@ impl Maestro {
     pub fn get_errors(&mut self) -> Result<Vec<Errors>> {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
-        self
-            .read_after_writing(write_result)
+        self.read_after_writing(write_result)
             .map(Errors::into_errors)
     }
 }
@@ -462,8 +450,7 @@ impl Maestro {
 
         let slice = &mut self.read_buf.as_mut().unwrap().as_mut()[0usize..length];
 
-        self
-            .uart
+        self.uart
             .as_mut()
             .unwrap()
             .read(slice)
@@ -507,8 +494,7 @@ impl Maestro {
 
         let slice = &self.write_buf.as_mut().unwrap().as_mut()[0usize..length];
 
-        self
-            .uart
+        self.uart
             .as_mut()
             .unwrap()
             .write(slice)
