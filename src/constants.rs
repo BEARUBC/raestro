@@ -236,7 +236,7 @@ impl Errors {
             data >>= 1usize;
         }
 
-        return vec;
+        vec
     }
 }
 
@@ -249,13 +249,13 @@ impl From<u16> for Errors {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        return if (data >= (Errors::SER_SIGNAL_ERR as u16))
+        if (data >= (Errors::SER_SIGNAL_ERR as u16))
             && (data <= (Errors::SCRIPT_PC_ERR as u16))
         {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()
-        };
+        }
     }
 }
 
