@@ -140,7 +140,7 @@ impl Maestro {
     /// This instance is no longer usable to
     /// communicate with the Maestro, unless
     /// until `Maestro::start()` is called again.
-    pub fn close(&mut self) -> () {
+    pub fn close(&mut self) {
         self.uart = None;
         self.read_buf = None;
         self.write_buf = None;
@@ -366,7 +366,7 @@ impl Maestro {
     ///
     /// assert_eq!(position, actual_position);
     /// ```
-    pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
+    pub fn get_position(&mut self, channel: Channels) -> Result<u16> {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
         self.read_after_writing(write_result)
@@ -635,5 +635,11 @@ impl Maestro {
         write_result
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .map(|()| self.prepare_data_from_buffer())
+    }
+}
+
+impl Default for Maestro {
+    fn default() -> Self {
+        Maestro::new()
     }
 }
