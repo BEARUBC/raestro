@@ -255,7 +255,8 @@ impl From<u16> for Errors {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        if (data >= (Errors::SER_SIGNAL_ERR as u16)) && (data <= (Errors::SCRIPT_PC_ERR as u16)) {
+        if ((Errors::SER_SIGNAL_ERR as u16)..=(Errors::SCRIPT_PC_ERR as u16)).contains(&data) {
+        // if (data >= (Errors::SER_SIGNAL_ERR as u16)) && (data <= (Errors::SCRIPT_PC_ERR as u16)) {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()
@@ -270,7 +271,7 @@ mod errors_test {
     #[test]
     fn no_errors() -> () {
         let err = 0u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 0usize);
     }
@@ -278,7 +279,7 @@ mod errors_test {
     #[test]
     fn ser_signal_error() -> () {
         let err = 1u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 1usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);
@@ -287,7 +288,7 @@ mod errors_test {
     #[test]
     fn ser_overrun_error() -> () {
         let err = 2u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 1usize);
         assert_eq!(actual_vec[0usize], Errors::SER_OVERRUN_ERR);
@@ -296,7 +297,7 @@ mod errors_test {
     #[test]
     fn two_errors() -> () {
         let err = 3u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 2usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);
@@ -306,7 +307,7 @@ mod errors_test {
     #[test]
     fn invalid_err() -> () {
         let err = 0x0200u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 0usize);
     }
@@ -314,7 +315,7 @@ mod errors_test {
     #[test]
     fn all_errors() -> () {
         let err = 0x01ffu16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 9usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);
