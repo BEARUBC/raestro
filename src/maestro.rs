@@ -410,7 +410,7 @@ impl Maestro {
 
         self
             .read_after_writing(write_result)
-            .map(|data| Errors::into_errors(data))
+            .map(Errors::into_errors)
     }
 }
 
@@ -467,7 +467,7 @@ impl Maestro {
             .as_mut()
             .unwrap()
             .read(slice)
-            .map_err(|rppal_err| Error::from(rppal_err))
+            .map_err(Error::from)
             .and_then(|bytes_read| {
                 if bytes_read == length {
                     Ok(())
