@@ -171,10 +171,7 @@ impl Maestro {
         self.uart
             .as_mut()
             .ok_or(Error::Uninitialized)
-            .and_then(|uart| {
-                uart.set_read_mode(0u8, duration)
-                    .map_err(Error::from)
-            })
+            .and_then(|uart| uart.set_read_mode(0u8, duration).map_err(Error::from))
     }
 }
 
