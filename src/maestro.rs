@@ -104,10 +104,10 @@ impl Maestro {
     /// prevent any leakage of `maestro` instances
     /// into the `invalid` state.
     pub fn start(&mut self, baud_rate: BaudRates) -> Result<()> {
-        let uart_result: RppalResult<Uart> =
+        let result: RppalResult<Uart> =
             Uart::new(baud_rate as u32, Parity::None, DATA_BITS, STOP_BITS);
 
-        uart_result
+        result
             .and_then(|uart| {
                 self.uart = Some(Box::new(uart));
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
@@ -117,7 +117,7 @@ impl Maestro {
                     .as_mut()
                     .unwrap()
                     .as_mut()
-                    .set_read_mode(RESPONSE_SIZE, DEFAULT_BLOCKING_DURATION)
+                    .set_read_mode(0u8, DEFAULT_BLOCKING_DURATION)
             })
             .map(|()| {
                 let buf = self.write_buf.as_mut().unwrap().as_mut();
@@ -172,7 +172,7 @@ impl Maestro {
             .as_mut()
             .ok_or(Error::Uninitialized)
             .and_then(|uart| {
-                uart.set_read_mode(RESPONSE_SIZE, duration)
+                uart.set_read_mode(0u8, duration)
                     .map_err(Error::from)
             })
     }
@@ -373,13 +373,13 @@ impl Maestro {
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let target = 1234u16; // can be any value between 3968u16 and 8000u16
+    /// let target = 4000u16; // can be any value between 3968u16 and 8000u16
     ///
     /// m.set_target(channel, target);
     ///
     /// let actual_position = m.get_position(channel).unwrap();
     ///
-    /// assert_eq!(position, actual_position);
+    /// assert_eq!(target, actual_position);
     /// ```
     pub fn get_position(&mut self, channel: Channels) -> Result<u16> {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);

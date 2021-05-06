@@ -77,7 +77,7 @@
 //! instance, as well as how to send some commands
 //! to the Micro Maestro 6-Channel Servo Board.
 //!
-//! ```ignore
+//! ```
 //! use std::{
 //!     thread,
 //!     time::Duration,
@@ -89,16 +89,17 @@
 //!
 //! let channel: Channels = Channels::C_0;
 //!
-//! let pos_min = 992u16;
-//! let pos_max = 2000u16;
+//! let target_min = 3968u16;
+//! let target_max = 8000u16;
 //!
 //! let sleep_time = Duration::from_millis(1000u64);
 //!
-//! loop {
-//!     m.set_target(channel, pos_min).unwrap();
+//! // just swivel back and forth 10 times
+//! for _ in 0u8..10u8 {
+//!     m.set_target(channel, target_min).unwrap();
 //!     thread::sleep(sleep_time);
 //!
-//!     m.set_target(channel, pos_max).unwrap();
+//!     m.set_target(channel, target_max).unwrap();
 //!     thread::sleep(sleep_time);
 //! }
 //! ```
