@@ -1,11 +1,11 @@
 on: [push]
 
-name: Raestro CI
+name: Raestro CI - Raspberry Pi
 
 jobs:
   job1:
     name: Check
-    runs-on: self-hosted
+    runs-on: raspberrypi
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -18,8 +18,8 @@ jobs:
           command: check
 
   job2:
-    name: Test
-    runs-on: self-hosted
+    name: Test Suite
+    runs-on: raspberrypi
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -30,19 +30,3 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
-
-  job3:
-    name: Nightly Format
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          override: true
-      - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check

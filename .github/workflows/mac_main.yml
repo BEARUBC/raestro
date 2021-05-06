@@ -1,0 +1,20 @@
+on: [push]
+
+name: Raestro CI - Macbook Machine
+
+jobs:
+  job1:
+    name: Nightly Format
+    runs-on: macbook
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
