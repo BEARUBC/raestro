@@ -225,7 +225,7 @@ impl Maestro {
     /// m.set_target(channel, qtr_microsec);
     /// ```
     pub fn set_target(&mut self, channel: Channels, target: u16) -> Result<()> {
-        if MIN_QTR_PWM <= target && target <= MAX_QTR_PWM {
+        if (MIN_QTR_PWM..=MAX_QTR_PWM).contains(&target) {
             Ok(target)
         } else {
             Err(Error::InvalidValue(target))
