@@ -49,7 +49,7 @@ The link is [here](https://docs.rs/rppal/0.11.3/rppal/uart/index.html).
 Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
-raestro = "0.2.0"
+raestro = "0.3.0"
 ```
 Create a new `maestro` instance and initialize it by calling `Maestro::start`.
 This initialized struct can now be utilized to perform reads and writes to and from the Micro-Maestro 6-Channel.
