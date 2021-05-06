@@ -258,7 +258,7 @@ impl Maestro {
         self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed)
     }
 
-    /// Sets the rotational acceleration limit of 
+    /// Sets the rotational acceleration limit of
     /// the servo motor at the given channel with
     /// the given value.
     ///
