@@ -1,11 +1,11 @@
 on: [push]
 
-name: Raestro CI - Macbook Machine
+name: Raestro CI - Macbook
 
 jobs:
   job1:
     name: Nightly Format
-    runs-on: macbook
+    runs-on: [self-hosted, linux, x64, gpu]
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
