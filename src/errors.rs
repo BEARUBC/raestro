@@ -79,7 +79,7 @@ pub enum Error {
 #[doc(hidden)]
 impl Error {
     /// Constructs a `std::io::Error` from the
-    /// given parameters
+    /// given parameters.
     pub(crate) fn new_io_error<E>(err_kind: IoErrorKind, err_msg: E) -> Self
     where
         E: Into<Box<dyn StdError + Send + Sync>>,
@@ -95,9 +95,9 @@ impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
             Error::Uninitialized => write!(f, "maestro struct is uninitialized; please consider calling .start() on the instance first"),
-            Error::InvalidValue(value) => write!(f, "microsec values must be between 992us and 2000us but {}us was used", value),
-            Error::FaultyRead { actual_count, } => write!(f, "2 bytes were expected to be read, but only {} bytes were actually read", actual_count),
-            Error::FaultyWrite { actual_count, expected_count, } => write!(f, "{} bytes were expected to be written, but only {} bytes were actually written", expected_count, actual_count),
+            Error::InvalidValue(value) => write!(f, "target must be between 3968 quarter-us (992us) and 8000 quarter-us (2000us) but {} quarter-us was used", value),
+            Error::FaultyRead { actual_count, } => write!(f, "2 bytes were expected to be read, but only {} byte(s) were actually read", actual_count),
+            Error::FaultyWrite { actual_count, expected_count, } => write!(f, "{} bytes were expected to be written, but only {} byte(s) were actually written", expected_count, actual_count),
             Error::Io(io_error) => io_error.fmt(f),
         }
     }
