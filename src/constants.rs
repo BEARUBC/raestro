@@ -24,7 +24,6 @@ pub(crate) const DATA_BITS: u8 = 8u8;
 pub(crate) const STOP_BITS: u8 = 1u8;
 pub(crate) const MIN_WRITE_LENGTH: usize = 3usize;
 pub(crate) const RESPONSE_SIZE: u8 = 2u8;
-pub(crate) const DATA_MULTIPLIER: usize = 2usize;
 
 /// The minimum PWM that can be sent to any
 /// channel by the Maestro.
@@ -32,7 +31,7 @@ pub(crate) const DATA_MULTIPLIER: usize = 2usize;
 /// All values below `MIN_PWM` being used as
 /// parameters to `set_target` will result in an
 /// error.
-pub const MIN_PWM: u16 = 992u16;
+pub const MIN_QTR_PWM: u16 = 3968u16;
 
 /// The maximum PWM that can be sent to any
 /// channel by the Maestro.
@@ -40,15 +39,11 @@ pub const MIN_PWM: u16 = 992u16;
 /// All values above `MAX_PWM` being used as
 /// parameters to `set_target` will result in an
 /// error.
-pub const MAX_PWM: u16 = 2000u16;
+pub const MAX_QTR_PWM: u16 = 8000u16;
 
 /// All available command flags supported by the
 /// Pololu-Protocol.
-///
-/// # TODO
-/// Review existing docs for this enum and add
-/// more iff necessary.
-#[allow(non_camel_case_types, unused)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub(crate) enum CommandFlags {
@@ -59,17 +54,19 @@ pub(crate) enum CommandFlags {
     GET_ERRORS = 0xA1u8,
     GO_HOME = 0xA2u8,
     STOP_SCRIPT = 0xA4u8,
+
+    #[allow(unused)]
     RESTART_SCRIPT_AT_SUBROUTINE = 0xA7u8,
+
+    #[allow(unused)]
     RESTART_SCRIPT_AT_SUBROUTINE_WITH_PARAMETER = 0xA8u8,
+
+    #[allow(unused)]
     GET_SCRIPT_STATUS = 0xAEu8,
 }
 
 /// All available channels to send commands to.
-///
-/// # TODO
-/// Review existing docs for this enum and add
-/// more iff necessary.
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum Channels {
@@ -95,15 +92,9 @@ pub enum Channels {
 /// Available baudrates supported by the Maestro.
 ///
 /// Note that not all baudrates have been
-/// specified.
-///
-/// # TODO
-/// Add all remaining baudrates to the enum
-/// below.
-///
-/// Review existing docs for this enum and add
-/// more iff necessary.
-#[allow(non_camel_case_types)]
+/// specified. They will be added in a future
+/// release.
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
 pub enum BaudRates {
@@ -121,7 +112,7 @@ pub enum BaudRates {
 /// from section 4.e of the Pololu Micro Maestro
 /// manual, which can be found
 /// [here](https://www.pololu.com/docs/pdf/0J40/maestro.pdf).
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u16)]
 pub enum Errors {
@@ -222,7 +213,7 @@ impl Errors {
     /// only the first 9 bits (bit 0 to bit 8) can
     /// be set in the `u16`. All other bits
     /// are ignored.
-    pub fn into_errors(mut data: u16) -> Vec<Errors> {
+    pub fn from_data(mut data: u16) -> Vec<Errors> {
         #[allow(unused)]
         const MASK: u16 = 0x0001u16;
 
@@ -236,7 +227,7 @@ impl Errors {
             data >>= 1usize;
         }
 
-        return vec;
+        vec
     }
 }
 
@@ -249,13 +240,11 @@ impl From<u16> for Errors {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        return if (data >= (Errors::SER_SIGNAL_ERR as u16))
-            && (data <= (Errors::SCRIPT_PC_ERR as u16))
-        {
+        if ((Errors::SER_SIGNAL_ERR as u16)..=(Errors::SCRIPT_PC_ERR as u16)).contains(&data) {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()
-        };
+        }
     }
 }
 
@@ -266,7 +255,7 @@ mod errors_test {
     #[test]
     fn no_errors() -> () {
         let err = 0u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 0usize);
     }
@@ -274,7 +263,7 @@ mod errors_test {
     #[test]
     fn ser_signal_error() -> () {
         let err = 1u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 1usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);
@@ -283,7 +272,7 @@ mod errors_test {
     #[test]
     fn ser_overrun_error() -> () {
         let err = 2u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 1usize);
         assert_eq!(actual_vec[0usize], Errors::SER_OVERRUN_ERR);
@@ -292,7 +281,7 @@ mod errors_test {
     #[test]
     fn two_errors() -> () {
         let err = 3u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 2usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);
@@ -302,7 +291,7 @@ mod errors_test {
     #[test]
     fn invalid_err() -> () {
         let err = 0x0200u16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 0usize);
     }
@@ -310,7 +299,7 @@ mod errors_test {
     #[test]
     fn all_errors() -> () {
         let err = 0x01ffu16;
-        let actual_vec = Errors::into_errors(err);
+        let actual_vec = Errors::from_data(err);
 
         assert_eq!(actual_vec.len(), 9usize);
         assert_eq!(actual_vec[0usize], Errors::SER_SIGNAL_ERR);

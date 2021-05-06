@@ -27,8 +27,8 @@ fn main() -> () {
     let channel1: Channels = Channels::C_1;
     let channel2: Channels = Channels::C_2;
 
-    let pos_min = 992u16;
-    let pos_max = 2000u16;
+    let pos_min = 3968u16;
+    let pos_max = 8000u16;
 
     let sleep_time = Duration::from_millis(1000u64);
 

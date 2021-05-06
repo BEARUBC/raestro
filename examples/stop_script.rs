@@ -25,17 +25,17 @@ fn main() -> () {
 
     let channel: Channels = Channels::C_0;
 
-    let pos0 = 992u16;
-    let pos1 = 2000u16;
+    let target_min = 3968u16;
+    let target_max = 8000u16;
 
     let sleep_time = Duration::from_millis(1000u64);
 
     loop {
-        maestro.set_target(channel, pos0).unwrap();
+        maestro.set_target(channel, target_min).unwrap();
         maestro.stop_script().unwrap();
         thread::sleep(sleep_time);
 
-        maestro.set_target(channel, pos1).unwrap();
+        maestro.set_target(channel, target_max).unwrap();
         maestro.stop_script().unwrap();
         thread::sleep(sleep_time);
     }
