@@ -25,8 +25,8 @@ fn main() -> () {
 
     let channel: Channels = Channels::C_0;
 
-    let pos_min = 992u16;
-    let pos_max = 2000u16;
+    let target_min = 3968u16;
+    let target_max = 8000u16;
 
     let sleep_time = Duration::from_millis(1000u64);
 
@@ -34,14 +34,14 @@ fn main() -> () {
     let mut current_position: Option<u16> = None;
 
     loop {
-        maestro.set_target(channel, pos_min).unwrap();
+        maestro.set_target(channel, target_min).unwrap();
         current_position = Some(maestro.get_position(channel).unwrap());
-        println!("current position: {:?}", current_position.unwrap());
+        assert_eq!(current_position.unwrap(), target_min);
         thread::sleep(sleep_time);
 
-        maestro.set_target(channel, pos_max).unwrap();
+        maestro.set_target(channel, target_max).unwrap();
         current_position = Some(maestro.get_position(channel).unwrap());
-        println!("current position: {:?}", current_position.unwrap());
+        assert_eq!(current_position.unwrap(), target_max);
         thread::sleep(sleep_time);
     }
 }
