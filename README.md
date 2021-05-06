@@ -63,14 +63,15 @@ fn main() -> () {
 	let channel = Channels::C_0;
 
 	// the position is in microseconds and can only be between 992 and 2000
+	// the set_target method takes in a target in quarter microseconds, so multiply the desired value by 4
 	// (specifically for the Pololu Micro-Maestro 6-Channel Board)
-	let position = 992u16;
+	let target = 3968u16;
 
-	maestro.set_target(channel, position).unwrap();
+	maestro.set_target(channel, target).unwrap();
 
 	let actual_position = maestro.get_position(channel).unwrap();
 	
-	assert_eq!(position, actual_position);
+	assert_eq!(target, actual_position);
 }
 ```
 More examples of API usage are provided in the `examples` folder.
