@@ -1,10 +1,10 @@
 on: [push]
 
-name: Raestro CI - Raspberry Pi
+name: Raestro Split CI
 
 jobs:
-  job1:
-    name: Check
+  job-rpi-1:
+    name: Check (rpi)
     runs-on: raspberrypi
     steps:
       - uses: actions/checkout@v2
@@ -17,8 +17,8 @@ jobs:
         with:
           command: check
 
-  job2:
-    name: Test Suite
+  job-rpi-2:
+    name: Test Suite (rpi)
     runs-on: raspberrypi
     steps:
       - uses: actions/checkout@v2
@@ -30,3 +30,19 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
+
+  job-gh-1:
+    name: Nightly Format (gh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
