@@ -92,7 +92,8 @@ pub enum Channels {
 /// Available baudrates supported by the Maestro.
 ///
 /// Note that not all baudrates have been
-/// specified. They will be added in a future release.
+/// specified. They will be added in a future
+/// release.
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]
