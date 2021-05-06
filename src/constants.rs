@@ -24,7 +24,6 @@ pub(crate) const DATA_BITS: u8 = 8u8;
 pub(crate) const STOP_BITS: u8 = 1u8;
 pub(crate) const MIN_WRITE_LENGTH: usize = 3usize;
 pub(crate) const RESPONSE_SIZE: u8 = 2u8;
-pub(crate) const DATA_MULTIPLIER: usize = 2usize;
 
 /// The minimum PWM that can be sent to any
 /// channel by the Maestro.
@@ -32,7 +31,7 @@ pub(crate) const DATA_MULTIPLIER: usize = 2usize;
 /// All values below `MIN_PWM` being used as
 /// parameters to `set_target` will result in an
 /// error.
-pub const MIN_PWM: u16 = 992u16;
+pub const MIN_QTR_PWM: u16 = 3968u16;
 
 /// The maximum PWM that can be sent to any
 /// channel by the Maestro.
@@ -40,14 +39,10 @@ pub const MIN_PWM: u16 = 992u16;
 /// All values above `MAX_PWM` being used as
 /// parameters to `set_target` will result in an
 /// error.
-pub const MAX_PWM: u16 = 2000u16;
+pub const MAX_QTR_PWM: u16 = 8000u16;
 
 /// All available command flags supported by the
 /// Pololu-Protocol.
-///
-/// # TODO
-/// Review existing docs for this enum and add
-/// more iff necessary.
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
@@ -71,10 +66,6 @@ pub(crate) enum CommandFlags {
 }
 
 /// All available channels to send commands to.
-///
-/// # TODO
-/// Review existing docs for this enum and add
-/// more iff necessary.
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
@@ -101,14 +92,7 @@ pub enum Channels {
 /// Available baudrates supported by the Maestro.
 ///
 /// Note that not all baudrates have been
-/// specified.
-///
-/// # TODO
-/// Add all remaining baudrates to the enum
-/// below.
-///
-/// Review existing docs for this enum and add
-/// more iff necessary.
+/// specified. They will be added in a future release.
 #[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u32)]

@@ -200,9 +200,16 @@ impl Maestro {
     /// the given microseconds.
     ///
     /// Microsecond ranges can only be between
-    /// `992microsecs` and `2000microsecs`.
+    /// `992us` and `2000us`.
+    /// However, the input to `set_target` is in
+    /// quarter microseconds. Thus, the accepted
+    /// range to `set_target` is between `3968`
+    /// and `8000`.
     /// Any values outside of this range will
     /// return an error.
+    ///
+    /// The units to `set_target` are in:
+    /// `target * (0.25) [us]`
     ///
     /// # Example Usage
     /// ```
@@ -212,24 +219,28 @@ impl Maestro {
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let microsec = 1234u16; // can be any value between 992u16 and 2000u16
+    /// let qtr_microsec = 4000u16; // can be any value between 3968 and 8000
+    /// // 4000 quarter microsecs would be 1000us, thus this example sets a target of 1000us
     ///
-    /// m.set_target(channel, microsec);
+    /// m.set_target(channel, qtr_microsec);
     /// ```
-    pub fn set_target(&mut self, channel: Channels, microsec: u16) -> Result<()> {
-        if MIN_PWM <= microsec && microsec <= MAX_PWM {
-            Ok(microsec << DATA_MULTIPLIER)
+    pub fn set_target(&mut self, channel: Channels, target: u16) -> Result<()> {
+        if MIN_QTR_PWM <= target && target <= MAX_QTR_PWM {
+            Ok(target)
         } else {
-            Err(Error::InvalidValue(microsec))
+            Err(Error::InvalidValue(target))
         }
-        .and_then(move |payload| {
-            self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, payload)
+        .and_then(move |target| {
+            self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, target)
         })
     }
 
     /// Sets the rotational speed of the servo
     /// motor at the given channel with the
     /// given speed.
+    ///
+    /// The units to `set_speed` are in:
+    /// `speed * (0.025) [us / ms]`
     ///
     /// # Example Usage
     /// ```
@@ -243,21 +254,28 @@ impl Maestro {
     ///
     /// m.set_speed(channel, speed);
     /// ```
-    ///
-    /// # TODO
-    /// Search up the max speed value allowable.
     pub fn set_speed(&mut self, channel: Channels, speed: u16) -> Result<()> {
         self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed)
     }
 
-    /// Sets the rotational acceleration of the
-    /// servo motor at the given channel with
+    /// Sets the rotational acceleration limit of 
+    /// the servo motor at the given channel with
     /// the given value.
     ///
     /// The acceleration can be any usigned 8-bit
     /// integer from `1u8` to `255u8`. An
     /// acceleration of `0u8` will command the
-    /// Maestro to reject the request.
+    /// Maestro to *not* set any acceleration
+    /// limit.
+    ///
+    /// Note that an acceleration limit causes
+    /// the servo to speed up and the slow down
+    /// as it approaches the target. By having no
+    /// acceleration limit, this behaviour is
+    /// disabled.
+    ///
+    /// The units to `set_acceleration` are in:
+    /// `acceleration * 0.0003125 [us / ((ms)^2)]`
     ///
     /// # Example Usage
     /// ```
@@ -271,11 +289,6 @@ impl Maestro {
     ///
     /// m.set_acceleration(channel, acceleration);
     /// ```
-    ///
-    /// # TODO:
-    /// Check if the Maestro actually rejects the
-    /// request or just doesn't move if `0u8`
-    /// is sent as the acceleration.
     pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
         self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16)
     }
@@ -283,7 +296,7 @@ impl Maestro {
     /// Sends all servos to home position.
     ///
     /// Home position is defined as
-    /// `992microsecs`.
+    /// `992us`.
     ///
     /// # Example Usage
     /// ```
@@ -308,10 +321,6 @@ impl Maestro {
     ///
     /// m.stop_script();
     /// ```
-    ///
-    /// # TODO
-    /// Find out how the Maestro implements
-    /// `stop_script`.
     pub fn stop_script(&mut self) -> Result<()> { self.write_command(CommandFlags::STOP_SCRIPT) }
 
     /// Gets the `PWM` signal being broadcasted to
@@ -350,6 +359,12 @@ impl Maestro {
     /// for your project, you will need to develop
     /// additional hardware.
     ///
+    /// `get_position` returns the `PWM` being
+    /// broadcasted in quarter microsec.
+    /// If `get_position` returns `4000`, the
+    /// servo is currently broadcasting `1000us`
+    /// to the respective channel.
+    ///
     /// # Example Usage
     /// ```ignore
     /// use raestro::prelude::*;
@@ -358,9 +373,9 @@ impl Maestro {
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let position = 1234u16; // can be any value between 992u16 and 2000u16
+    /// let target = 1234u16; // can be any value between 3968u16 and 8000u16
     ///
-    /// m.set_target(channel, position);
+    /// m.set_target(channel, target);
     ///
     /// let actual_position = m.get_position(channel).unwrap();
     ///
@@ -370,7 +385,6 @@ impl Maestro {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
         self.read_after_writing(write_result)
-            .map(move |result| result >> DATA_MULTIPLIER)
     }
 
     /// Gets any errors encountered by the Maestro
