@@ -1,6 +1,9 @@
 on: [push]
 
-name: Raestro Split CI
+# pi is the UBC Bionics Raspberry Pi
+# mb is raunakab's personal Macbook Pro
+# both are self-hosted runners, and may not be available to accept jobs at all times
+name: Raestro (pi/mb)-Split CI
 
 jobs:
   job-rpi-1:
@@ -31,8 +34,8 @@ jobs:
         with:
           command: test
 
-  job-gh-1:
-    name: Nightly Format (gh)
+  job-mb-1:
+    name: Nightly Format (mb)
     runs-on: macbook
     steps:
       - uses: actions/checkout@v2
