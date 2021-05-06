@@ -140,7 +140,7 @@ impl Maestro {
     /// This instance is no longer usable to
     /// communicate with the Maestro, unless
     /// until `Maestro::start()` is called again.
-    pub fn close(&mut self) -> () {
+    pub fn close(&mut self) {
         self.uart = None;
         self.read_buf = None;
         self.write_buf = None;
@@ -173,7 +173,7 @@ impl Maestro {
             .ok_or(Error::Uninitialized)
             .and_then(|uart| {
                 uart.set_read_mode(RESPONSE_SIZE, duration)
-                    .map_err(|rppal_err| Error::from(rppal_err))
+                    .map_err(Error::from)
             })
     }
 }
@@ -366,7 +366,7 @@ impl Maestro {
     ///
     /// assert_eq!(position, actual_position);
     /// ```
-    pub fn get_position(self: &mut Self, channel: Channels) -> Result<u16> {
+    pub fn get_position(&mut self, channel: Channels) -> Result<u16> {
         let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
 
         self.read_after_writing(write_result)
@@ -397,8 +397,7 @@ impl Maestro {
     pub fn get_errors(&mut self) -> Result<Vec<Errors>> {
         let write_result = self.write_command(CommandFlags::GET_ERRORS);
 
-        self.read_after_writing(write_result)
-            .map(Errors::into_errors)
+        self.read_after_writing(write_result).map(Errors::from_data)
     }
 }
 
@@ -443,7 +442,7 @@ impl Maestro {
     /// * `self.uart` array is the `None` variant;
     ///   in this case, the `self` instance has
     ///   NOT been initialized.
-    fn read(self: &mut Self, length: usize) -> Result<()> {
+    fn read(&mut self, length: usize) -> Result<()> {
         if length > BUFFER_SIZE {
             panic!();
         }
@@ -487,8 +486,8 @@ impl Maestro {
     /// * `self.uart` array is the `None` variant;
     ///   in this case, the `self` instance has
     ///   NOT been initialized.
-    fn write(self: &mut Self, length: usize) -> Result<()> {
-        if (length < MIN_WRITE_LENGTH) || (length > BUFFER_SIZE) {
+    fn write(&mut self, length: usize) -> Result<()> {
+        if !(MIN_WRITE_LENGTH..=BUFFER_SIZE).contains(&length) {
             panic!();
         }
 
@@ -498,7 +497,7 @@ impl Maestro {
             .as_mut()
             .unwrap()
             .write(slice)
-            .map_err(|rppal_err| Error::from(rppal_err))
+            .map_err(Error::from)
             .and_then(|bytes_written| {
                 if bytes_written == length {
                     Ok(())
@@ -527,7 +526,7 @@ impl Maestro {
     ///   instance has NOT been initialized.
     #[inline]
     fn write_channel_and_payload(
-        self: &mut Self,
+        &mut self,
         command_flag: CommandFlags,
         channel: Channels,
         microsec: u16,
@@ -562,7 +561,7 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn write_channel(self: &mut Self, command_flag: CommandFlags, channel: Channels) -> Result<()> {
+    fn write_channel(&mut self, command_flag: CommandFlags, channel: Channels) -> Result<()> {
         let length_to_write = 4usize;
 
         let command = mask_byte(command_flag as u8);
@@ -590,7 +589,7 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn write_command(self: &mut Self, command_flag: CommandFlags) -> Result<()> {
+    fn write_command(&mut self, command_flag: CommandFlags) -> Result<()> {
         let length_to_write = 3usize;
 
         let command = mask_byte(command_flag as u8);
@@ -613,7 +612,7 @@ impl Maestro {
     ///   variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn prepare_data_from_buffer(self: &mut Self) -> u16 {
+    fn prepare_data_from_buffer(&mut self) -> u16 {
         let buf = self.read_buf.as_mut().unwrap().as_mut();
 
         let data: u16 = ((buf[1usize] as u16) << 8usize) | (buf[0usize] as u16);
@@ -631,9 +630,13 @@ impl Maestro {
     /// `write`, and then immediately a
     /// `read_after_writing`. Therefore, for those
     /// types of situations, use this method.
-    fn read_after_writing(self: &mut Self, write_result: Result<()>) -> Result<u16> {
+    fn read_after_writing(&mut self, write_result: Result<()>) -> Result<u16> {
         write_result
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .map(|()| self.prepare_data_from_buffer())
     }
+}
+
+impl Default for Maestro {
+    fn default() -> Self { Maestro::new() }
 }

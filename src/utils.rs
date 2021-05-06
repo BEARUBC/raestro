@@ -10,7 +10,7 @@
 #[inline]
 pub(crate) fn mask_byte(byte: u8) -> u8 {
     let top_mask: u8 = 0x7fu8;
-    return byte & top_mask;
+    byte & top_mask
 }
 
 /// The Pololu-Protocol requires that the `u16` be
@@ -34,7 +34,7 @@ pub(crate) fn microsec_to_target(microsec: u16) -> (u8, u8) {
     let lower = mask_byte(microsec as u8);
     let upper = mask_byte((microsec >> down_shift) as u8);
 
-    return (lower, upper);
+    (lower, upper)
 }
 
 #[cfg(test)]
