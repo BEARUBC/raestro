@@ -16,6 +16,12 @@ Note that all dates are in DD/MM/YYYY form.
 * finished documentation for all public modules and exports
 * formatted library using rustfmt (all formatting rules can be found in rustfmt.toml)
 * fixed implementation for raestro::constants::Errors
-	* when an error or errors are encountered, the Maestro returns a 2-byte (u16) integer in which each of the first 9 positions (i.e., bit 0 to bit 8) represent an error
-	* if the bit in position i (where i = 0..=8) is set, then the according error was thrown by the Maestro
-	* previous implementation of constants::Errors assumed that each error had a specific number attached to it (i.e., SER_SIGNAL_ERR was 0, SER_BUFFER_ERR was 1, etc.), which is incorrect
+	* when an error or errors are encountered, the Maestro returns a 2-byte (`u16`) integer in which each of the first 9 positions (i.e., bit 0 to bit 8) represent an error
+	* if the bit in position i (where i = `0..=8`) is set, then the according error was thrown by the Maestro
+	* previous implementation of `constants::Errors` assumed that each error had a specific number attached to it (i.e., `SER\_SIGNAL\_ERR` was `0`, `SER\_BUFFER\_ERR` was `1`, etc.), which is incorrect
+
+### 05/06/2021
+* the underlying `uart` instance was incorrectly configured to wait indefinitely if no bytes were read on the `UART` lines
+* this was updated so that `Maestro::read` would only block for 2 seconds, max  (default configuration)
+* `Maestro::set_target` was updated to take in values in units of quarter-us, not us, since all other `raestro` APIs expect values in units of quarter-us
+	* docs were updated to reflect this change
