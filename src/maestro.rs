@@ -269,7 +269,14 @@ impl Maestro {
         } else {
             Err(Error::InvalidValue(target))
         }
-        .and_then(move |target| {
+        .and_then(|target| {
+            if self.is_initialized() {
+                Ok(target)
+            } else {
+                Err(Error::Uninitialized)
+            }
+        })
+        .and_then(|target| {
             self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, target)
         })
     }
@@ -294,7 +301,14 @@ impl Maestro {
     /// m.set_speed(channel, speed);
     /// ```
     pub fn set_speed(&mut self, channel: Channels, speed: u16) -> Result<()> {
-        self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed)
+        if self.is_initialized() {
+            Ok(speed)
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|speed| {
+            self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed)
+        })
     }
 
     /// Sets the rotational acceleration limit of
@@ -329,7 +343,14 @@ impl Maestro {
     /// m.set_acceleration(channel, acceleration);
     /// ```
     pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
-        self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16)
+        if self.is_initialized() {
+            Ok(acceleration)
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|acceleration| {
+            self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16)
+        })
     }
 
     /// Sends all servos to home position.
@@ -346,7 +367,16 @@ impl Maestro {
     ///
     /// m.go_home();
     /// ```
-    pub fn go_home(&mut self) -> Result<()> { self.write_command(CommandFlags::GO_HOME) }
+    pub fn go_home(&mut self) -> Result<()> {
+        if self.is_initialized() {
+            Ok(())
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|()| {
+            self.write_command(CommandFlags::GO_HOME)
+        })
+    }
 
     /// Stops all requested actions sent to the
     /// Maestro to be stopped immediately.
@@ -360,7 +390,16 @@ impl Maestro {
     ///
     /// m.stop_script();
     /// ```
-    pub fn stop_script(&mut self) -> Result<()> { self.write_command(CommandFlags::STOP_SCRIPT) }
+    pub fn stop_script(&mut self) -> Result<()> {
+        if self.is_initialized() {
+            Ok(())
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|()| {
+            self.write_command(CommandFlags::STOP_SCRIPT)
+        })
+    }
 
     /// Gets the `PWM` signal being broadcasted to
     /// the servo at the given channel.
@@ -421,7 +460,11 @@ impl Maestro {
     /// assert_eq!(target, actual_position);
     /// ```
     pub fn get_position(&mut self, channel: Channels) -> Result<u16> {
-        let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
+        let write_result = if self.is_initialized() {
+            self.write_channel(CommandFlags::GET_POSITION, channel)
+        } else {
+            Err(Error::Uninitialized)
+        };
 
         self.read_after_writing(write_result)
     }
@@ -448,7 +491,11 @@ impl Maestro {
     /// let errors = m.get_errors().unwrap();
     /// ```
     pub fn get_errors(&mut self) -> Result<Vec<Errors>> {
-        let write_result = self.write_command(CommandFlags::GET_ERRORS);
+        let write_result = if self.is_initialized() {
+            self.write_command(CommandFlags::GET_ERRORS)
+        } else {
+            Err(Error::Uninitialized)
+        };
 
         self.read_after_writing(write_result).map(Errors::from_data)
     }
