@@ -25,16 +25,16 @@ pub(crate) const STOP_BITS: u8 = 1u8;
 pub(crate) const MIN_WRITE_LENGTH: usize = 3usize;
 pub(crate) const RESPONSE_SIZE: u8 = 2u8;
 
-/// The minimum PWM (in quarter us) that can be sent to any
-/// channel by the Maestro.
+/// The minimum PWM (in quarter us) that can be
+/// sent to any channel by the Maestro.
 ///
 /// All values below `MIN_QTR_PWM` being used as
 /// parameters to `set_target` will result in an
 /// error.
 pub const MIN_QTR_PWM: u16 = 3968u16;
 
-/// The maximum PWM (in quarter us) that can be sent to any
-/// channel by the Maestro.
+/// The maximum PWM (in quarter us) that can be
+/// sent to any channel by the Maestro.
 ///
 /// All values above `MAX_QTR_PWM` being used as
 /// parameters to `set_target` will result in an
