@@ -218,7 +218,10 @@ impl Maestro {
     /// should never be invalid - , this function
     /// must always return true! Receiving a
     /// false means that there is a serious flaw
-    /// in some API logic of this struct. If you receive a false, please raise an issue on this library's main repository, found [here](https://github.com/BEARUBC/raestro/issues).
+    /// in some API logic of this struct. If you
+    /// receive a false, please raise an issue on
+    /// this library's main repository, found
+    /// [here](https://github.com/BEARUBC/raestro/issues).
     /// Thank you.
     pub fn is_valid(&self) -> bool {
         if self.uart.is_some() {
