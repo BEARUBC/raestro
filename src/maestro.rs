@@ -173,6 +173,83 @@ impl Maestro {
             .ok_or(Error::Uninitialized)
             .and_then(|uart| uart.set_read_mode(0u8, duration).map_err(Error::from))
     }
+
+    /// Performs a partial-check on if a `maestro`
+    /// instance is initialized. Returns true
+    /// iff the `maestro` instance is initialized,
+    /// false otherwise.
+    ///
+    /// # Note on Implementation Details
+    /// Given that, if `self.uart` is the `Some`
+    /// variant, it must be bidirectionally
+    /// implied that `self.read_buf` and
+    /// `self.write_buf` are also both the `Some`
+    /// variants. I.e., `(self.uart.is_some()
+    /// <=> self.read_buf.is_some()) &&
+    /// (self.read_buf.is_some() <=>
+    /// self.write_buf.is_some())`.
+    /// Where `<=>` is the bidirectional
+    /// implication operator.
+    ///
+    /// This logic can then be used to imply that,
+    /// if and *only if* `self.uart.is_some()` is
+    /// true, then `self.read_buf.is_some()` and
+    /// `self.write_buf.is_some()` must *also* be
+    /// true. Therefore, checking if
+    /// `self.uart.is_some()` is true is
+    /// sufficient in checking the others are true
+    /// as well.
+    ///
+    /// This property can only be assumed given
+    /// the underlying invariant of the `maestro`
+    /// struct: all `maestro` instances must never
+    /// be `invalid`. Given that all APIs
+    /// adhere to this invariant and to upholding
+    /// its truthiness, this shortcut is valid and
+    /// can be performed.
+    pub fn is_initialized(&self) -> bool { self.uart.is_some() }
+
+    /// Performs a full-check on the validity of a
+    /// `maestro` instance.
+    ///
+    /// # Note
+    /// Given the invariant property of the
+    /// `maestro` struct - all `maestro` instances
+    /// should never be invalid - , this function
+    /// must always return true! Receiving a
+    /// false means that there is a serious flaw
+    /// in some API logic of this struct. If you
+    /// receive a false, please raise an issue on
+    /// this library's main repository, found
+    /// [here](https://github.com/BEARUBC/raestro/issues).
+    /// Thank you.
+    pub fn is_valid(&self) -> bool {
+        if self.uart.is_some() {
+            self.read_buf.is_some() && self.write_buf.is_some()
+        } else {
+            self.read_buf.is_none() && self.write_buf.is_none()
+        }
+    }
+
+    /// Given a `maestro` instances, forces it
+    /// into a state of validity.
+    /// If previously in an invalid state, the
+    /// `maestro` instance will be forcefully
+    /// closed.
+    ///
+    /// # Note
+    /// Given that a `maestro` instance should
+    /// never be in the invalid state (and given
+    /// that all APIs have adhered to this
+    /// invariant), this function should
+    /// technically never be required by the
+    /// end-user. Regardless, it is provided
+    /// just in case.
+    pub fn force_into_validity(&mut self) {
+        if !self.is_valid() {
+            self.close()
+        }
+    }
 }
 
 /// # Pololu Micro Maestro Protocols
@@ -227,7 +304,14 @@ impl Maestro {
         } else {
             Err(Error::InvalidValue(target))
         }
-        .and_then(move |target| {
+        .and_then(|target| {
+            if self.is_initialized() {
+                Ok(target)
+            } else {
+                Err(Error::Uninitialized)
+            }
+        })
+        .and_then(|target| {
             self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, target)
         })
     }
@@ -252,7 +336,12 @@ impl Maestro {
     /// m.set_speed(channel, speed);
     /// ```
     pub fn set_speed(&mut self, channel: Channels, speed: u16) -> Result<()> {
-        self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed)
+        if self.is_initialized() {
+            Ok(speed)
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|speed| self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed))
     }
 
     /// Sets the rotational acceleration limit of
@@ -287,7 +376,18 @@ impl Maestro {
     /// m.set_acceleration(channel, acceleration);
     /// ```
     pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
-        self.write_channel_and_payload(CommandFlags::SET_ACCELERATION, channel, acceleration as u16)
+        if self.is_initialized() {
+            Ok(acceleration)
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|acceleration| {
+            self.write_channel_and_payload(
+                CommandFlags::SET_ACCELERATION,
+                channel,
+                acceleration as u16,
+            )
+        })
     }
 
     /// Sends all servos to home position.
@@ -304,7 +404,14 @@ impl Maestro {
     ///
     /// m.go_home();
     /// ```
-    pub fn go_home(&mut self) -> Result<()> { self.write_command(CommandFlags::GO_HOME) }
+    pub fn go_home(&mut self) -> Result<()> {
+        if self.is_initialized() {
+            Ok(())
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|()| self.write_command(CommandFlags::GO_HOME))
+    }
 
     /// Stops all requested actions sent to the
     /// Maestro to be stopped immediately.
@@ -318,7 +425,14 @@ impl Maestro {
     ///
     /// m.stop_script();
     /// ```
-    pub fn stop_script(&mut self) -> Result<()> { self.write_command(CommandFlags::STOP_SCRIPT) }
+    pub fn stop_script(&mut self) -> Result<()> {
+        if self.is_initialized() {
+            Ok(())
+        } else {
+            Err(Error::Uninitialized)
+        }
+        .and_then(|()| self.write_command(CommandFlags::STOP_SCRIPT))
+    }
 
     /// Gets the `PWM` signal being broadcasted to
     /// the servo at the given channel.
@@ -379,7 +493,11 @@ impl Maestro {
     /// assert_eq!(target, actual_position);
     /// ```
     pub fn get_position(&mut self, channel: Channels) -> Result<u16> {
-        let write_result = self.write_channel(CommandFlags::GET_POSITION, channel);
+        let write_result = if self.is_initialized() {
+            self.write_channel(CommandFlags::GET_POSITION, channel)
+        } else {
+            Err(Error::Uninitialized)
+        };
 
         self.read_after_writing(write_result)
     }
@@ -406,7 +524,11 @@ impl Maestro {
     /// let errors = m.get_errors().unwrap();
     /// ```
     pub fn get_errors(&mut self) -> Result<Vec<Errors>> {
-        let write_result = self.write_command(CommandFlags::GET_ERRORS);
+        let write_result = if self.is_initialized() {
+            self.write_command(CommandFlags::GET_ERRORS)
+        } else {
+            Err(Error::Uninitialized)
+        };
 
         self.read_after_writing(write_result).map(Errors::from_data)
     }
