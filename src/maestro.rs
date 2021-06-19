@@ -437,8 +437,8 @@ impl Maestro {
     /// `self.read_buf`.
     ///
     /// Please note that the `self.uart.read`
-    /// method is being utilized to send the
-    /// commands over `UART`. This command
+    /// method is being utilized to read the 
+    /// data received over `UART`. This command
     /// operates on a blocking read. Blocking
     /// duration is default set to
     /// `DEFAULT_BLOCKING_DURATION`.
@@ -483,9 +483,9 @@ impl Maestro {
     /// located in the `self.write_buf` array.
     /// This is the method that actually calls
     /// `self.uart.write`. Other methods in this
-    /// `impl` block just write to
-    /// `self.write_buf`, but do not actually send
-    /// data over the `UART` pins.
+    /// `impl` block write to `self.write_buf`,
+    ///  and then call this function to send 
+    ///  the data over UART. 
     ///
     /// # Panics
     /// Panics if:
@@ -521,8 +521,8 @@ impl Maestro {
             })
     }
 
-    /// Writes the given arguments into the
-    /// appropriate place in `self.write_buf`.
+    /// Writes the given payload on a certain channel
+    /// into the appropriate place in `self.write_buf`.
     ///
     /// This method does not actually send the
     /// bytes over the `UART` pins. It just
@@ -557,8 +557,8 @@ impl Maestro {
         self.write(length_to_write)
     }
 
-    /// Writes the given arguments into the
-    /// appropriate place in `self.write_buf`.
+    /// Writes the given command on a certain channel
+    /// into the appropriate place in `self.write_buf`.
     ///
     /// This method does not actually send the
     /// bytes over the `UART` pins. It just
@@ -585,7 +585,7 @@ impl Maestro {
         self.write(length_to_write)
     }
 
-    /// Writes the given arguments into the
+    /// Writes the given command into the
     /// appropriate place in `self.write_buf`.
     ///
     /// This method does not actually send the
@@ -631,7 +631,7 @@ impl Maestro {
         data
     }
 
-    /// Takes the write result and applies
+    /// Takes the write result and
     /// immediately calls for a read after.
     ///
     /// Useful abstraction over Pololu protocols
