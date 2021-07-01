@@ -9,7 +9,7 @@
 //! for `UART` communication through the
 //! Pololu-Protocol.
 //!
-//! The specifics on the Pololu-Protoco, as well
+//! The specifics on the Pololu-Protocol, as well
 //! as the overall serial communication with the
 //! Maestro, can be found in the Pololu
 //! Micro-Maestro manual, located
