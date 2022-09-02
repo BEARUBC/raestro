@@ -5,29 +5,22 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::{
-    boxed::Box,
-    result::Result as StdResult,
-    time::Duration,
-    vec::Vec,
-};
+use std::boxed::Box;
+use std::result::Result as StdResult;
+use std::time::Duration;
+use std::vec::Vec;
 
-use rppal::uart::{
-    Parity,
-    Result as RppalResult,
-    Uart,
-};
+use rppal::uart::Parity;
+use rppal::uart::Result as RppalResult;
+use rppal::uart::Uart;
 
-use crate::{
-    constants::*,
-    errors::*,
-    utils::*,
-};
+use crate::constants::*;
+use crate::errors::*;
+use crate::utils::*;
 
 /// Public result type.
 ///
-/// Expands to `std::result::Result<T,
-/// raestro::error::Error>`.
+/// Expands to `std::result::Result<T, raestro::error::Error>`.
 pub type Result<T> = StdResult<T, Error>;
 
 const DEFAULT_BLOCKING_DURATION: Duration = Duration::from_secs(2u64);
@@ -45,7 +38,8 @@ const BUFFER_SIZE: usize = 6usize;
 /// 2. Pololu Micro Maestro Protocols; all the
 /// protocols supported by the Maestro, sendable
 /// over the `UART` pins on the Raspberry Pi
-#[derive(Debug)]
+#[derive(Default)]
+#[cfg_attr(test, derive(Debug))]
 pub struct Maestro {
     uart: Option<Box<Uart>>,
     read_buf: Option<Box<[u8; BUFFER_SIZE]>>,
@@ -79,16 +73,6 @@ pub struct Maestro {
 /// which must (and will) be guaranteed for all
 /// provided APIs.
 impl Maestro {
-    /// Creates a new `maestro` instance in the
-    /// `uninitialized` state.
-    pub fn new() -> Self {
-        Maestro {
-            uart: None,
-            read_buf: None,
-            write_buf: None,
-        }
-    }
-
     /// Transitions the given `maestro` instance
     /// to the `initialized` state with
     /// default configuration values.
@@ -104,10 +88,8 @@ impl Maestro {
     /// prevent any leakage of `maestro` instances
     /// into the `invalid` state.
     pub fn start(&mut self, baud_rate: BaudRates) -> Result<()> {
-        let result: RppalResult<Uart> =
-            Uart::new(baud_rate as u32, Parity::None, DATA_BITS, STOP_BITS);
-
-        result
+        let baud_rate = baud_rate as u32;
+        Uart::new(baud_rate, Parity::None, DATA_BITS, STOP_BITS)
             .and_then(|uart| {
                 self.uart = Some(Box::new(uart));
                 self.read_buf = Some(Box::new([0u8; BUFFER_SIZE]));
@@ -171,7 +153,9 @@ impl Maestro {
         self.uart
             .as_mut()
             .ok_or(Error::Uninitialized)
-            .and_then(|uart| uart.set_read_mode(0u8, duration).map_err(Error::from))
+            .and_then(|uart| {
+                uart.set_read_mode(0u8, duration).map_err(Error::from)
+            })
     }
 
     /// Performs a partial-check on if a `maestro`
@@ -207,7 +191,9 @@ impl Maestro {
     /// adhere to this invariant and to upholding
     /// its truthiness, this shortcut is valid and
     /// can be performed.
-    pub fn is_initialized(&self) -> bool { self.uart.is_some() }
+    pub fn is_initialized(&self) -> bool {
+        self.uart.is_some()
+    }
 
     /// Performs a full-check on the validity of a
     /// `maestro` instance.
@@ -312,7 +298,11 @@ impl Maestro {
             }
         })
         .and_then(|target| {
-            self.write_channel_and_payload(CommandFlags::SET_TARGET, channel, target)
+            self.write_channel_and_payload(
+                CommandFlags::SET_TARGET,
+                channel,
+                target,
+            )
         })
     }
 
@@ -341,7 +331,13 @@ impl Maestro {
         } else {
             Err(Error::Uninitialized)
         }
-        .and_then(|speed| self.write_channel_and_payload(CommandFlags::SET_SPEED, channel, speed))
+        .and_then(|speed| {
+            self.write_channel_and_payload(
+                CommandFlags::SET_SPEED,
+                channel,
+                speed,
+            )
+        })
     }
 
     /// Sets the rotational acceleration limit of
@@ -375,7 +371,11 @@ impl Maestro {
     ///
     /// m.set_acceleration(channel, acceleration);
     /// ```
-    pub fn set_acceleration(&mut self, channel: Channels, acceleration: u8) -> Result<()> {
+    pub fn set_acceleration(
+        &mut self,
+        channel: Channels,
+        acceleration: u8,
+    ) -> Result<()> {
         if self.is_initialized() {
             Ok(acceleration)
         } else {
@@ -567,20 +567,18 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `length` is strictly greater than the
-    ///   `BUFFER_SIZE`
-    /// * `self.read_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `length` is strictly greater than the `BUFFER_SIZE`
+    /// * `self.read_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
-    /// * `self.uart` array is the `None` variant;
-    ///   in this case, the `self` instance has
-    ///   NOT been initialized.
+    /// * `self.uart` array is the `None` variant; in this case, the `self`
+    ///   instance has NOT been initialized.
     fn read(&mut self, length: usize) -> Result<()> {
         if length > BUFFER_SIZE {
             panic!();
         }
 
-        let slice = &mut self.read_buf.as_mut().unwrap().as_mut()[0usize..length];
+        let slice =
+            &mut self.read_buf.as_mut().unwrap().as_mut()[0usize..length];
 
         self.uart
             .as_mut()
@@ -611,14 +609,11 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `length` is strictly greater than the
-    ///   `BUFFER_SIZE`
-    /// * `self.write_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `length` is strictly greater than the `BUFFER_SIZE`
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
-    /// * `self.uart` array is the `None` variant;
-    ///   in this case, the `self` instance has
-    ///   NOT been initialized.
+    /// * `self.uart` array is the `None` variant; in this case, the `self`
+    ///   instance has NOT been initialized.
     fn write(&mut self, length: usize) -> Result<()> {
         if !(MIN_WRITE_LENGTH..=BUFFER_SIZE).contains(&length) {
             panic!();
@@ -654,8 +649,7 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `self.write_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
     fn write_channel_and_payload(
@@ -690,11 +684,14 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `self.write_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
-    fn write_channel(&mut self, command_flag: CommandFlags, channel: Channels) -> Result<()> {
+    fn write_channel(
+        &mut self,
+        command_flag: CommandFlags,
+        channel: Channels,
+    ) -> Result<()> {
         let length_to_write = 4usize;
 
         let command = mask_byte(command_flag as u8);
@@ -718,8 +715,7 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `self.write_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `self.write_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
     fn write_command(&mut self, command_flag: CommandFlags) -> Result<()> {
@@ -741,8 +737,7 @@ impl Maestro {
     ///
     /// # Panics
     /// Panics if:
-    /// * `self.read_buf` array is the `None`
-    ///   variant; in this case, the `self`
+    /// * `self.read_buf` array is the `None` variant; in this case, the `self`
     ///   instance has NOT been initialized.
     #[inline]
     fn prepare_data_from_buffer(&mut self) -> u16 {
@@ -768,8 +763,4 @@ impl Maestro {
             .and_then(|()| self.read(RESPONSE_SIZE as usize))
             .map(|()| self.prepare_data_from_buffer())
     }
-}
-
-impl Default for Maestro {
-    fn default() -> Self { Maestro::new() }
 }

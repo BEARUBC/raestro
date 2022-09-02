@@ -17,14 +17,10 @@
 //! # Prelude
 //! Before continuing, please take note of the
 //! following points:
-//! * This library is developed specifically for
-//!   the Raspberry Pi. Builds on different
-//!   architectures will not be guaranteed to
-//!   work.
-//! * Please take caution in wiring the Pololu
-//!   Micro Maestro to the Raspberry Pi. Incorrect
-//!   wiring may lead to permanent hardware
-//!   damage.
+//! * This library is developed specifically for the Raspberry Pi. Builds on
+//!   different architectures will not be guaranteed to work.
+//! * Please take caution in wiring the Pololu Micro Maestro to the Raspberry
+//!   Pi. Incorrect wiring may lead to permanent hardware damage.
 //!
 //! # Getting Started
 //! Below are the hardware and software setup
@@ -55,15 +51,11 @@
 //! 1. Remove `console=serial0,11520` from
 //! `/boot/cmdline.txt` 2. Disable the Bluetooth
 //! by:
-//!     * Adding `dtoverlay=pi3-disable-bt` to
-//!       `/boot/config.txt`
-//!         * For the Raspberry Pi 4 models, add
-//!           `dtoverlay=disable-bt` instead
-//!         * Once this is done, reboot the
-//!           Raspberry Pi (by powering it off and
+//!     * Adding `dtoverlay=pi3-disable-bt` to `/boot/config.txt`
+//!         * For the Raspberry Pi 4 models, add `dtoverlay=disable-bt` instead
+//!         * Once this is done, reboot the Raspberry Pi (by powering it off and
 //!           then on again)
-//!     * Running the command `sudo systemctl
-//!       disable hciuart`
+//!     * Running the command `sudo systemctl disable hciuart`
 //!
 //! ### Trouble-shooting
 //! If permission denied errors are being
@@ -111,15 +103,8 @@ pub mod prelude;
 mod utils;
 #[cfg(test)]
 mod tests {
-    // external uses
-
-    // internal mods
-
-    // internal uses
-    use crate::{
-        constants::*,
-        maestro::*,
-    };
+    use crate::constants::*;
+    use crate::maestro::*;
 
     #[test]
     fn init_and_close() -> () {
@@ -129,6 +114,5 @@ mod tests {
     }
 }
 
-// internal uses
 pub use errors::*;
 pub use maestro::*;

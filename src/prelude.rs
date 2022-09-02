@@ -10,8 +10,6 @@
 //! Encapsulates all modules required for general
 //! usage of the `raestro` library.
 
-pub use crate::{
-    constants::*,
-    errors::*,
-    maestro::*,
-};
+pub use crate::constants::*;
+pub use crate::errors::*;
+pub use crate::maestro::*;

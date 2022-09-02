@@ -240,7 +240,9 @@ impl From<u16> for Errors {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        if ((Errors::SER_SIGNAL_ERR as u16)..=(Errors::SCRIPT_PC_ERR as u16)).contains(&data) {
+        if ((Errors::SER_SIGNAL_ERR as u16)..=(Errors::SCRIPT_PC_ERR as u16))
+            .contains(&data)
+        {
             unsafe { std::mem::transmute(data) }
         } else {
             panic!()

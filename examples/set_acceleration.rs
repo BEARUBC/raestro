@@ -8,10 +8,8 @@
 // external crates
 
 // external uses
-use std::{
-    thread,
-    time::Duration,
-};
+use std::thread;
+use std::time::Duration;
 
 use raestro::prelude::*;
 

@@ -5,23 +5,15 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::{
-    error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-    },
-    io::{
-        Error as IoError,
-        ErrorKind as IoErrorKind,
-    },
-};
+use std::error::Error as StdError;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
+use std::io::Error as IoError;
+use std::io::ErrorKind as IoErrorKind;
 
-use rppal::{
-    gpio::Error as GpioError,
-    uart::Error as UartError,
-};
+use rppal::gpio::Error as GpioError;
+use rppal::uart::Error as UartError;
 
 /// The custom `raestro` error type.
 ///
@@ -106,7 +98,9 @@ impl Display for Error {
 impl From<IoError> for Error {
     /// Wraps a `std::io::Error` in the
     /// `raestro::Error::Io` variant.
-    fn from(io_error: IoError) -> Self { Self::Io(io_error) }
+    fn from(io_error: IoError) -> Self {
+        Self::Io(io_error)
+    }
 }
 
 impl From<UartError> for Error {
@@ -117,7 +111,9 @@ impl From<UartError> for Error {
         match uart_error {
             UartError::Io(std_err) => Error::from(std_err),
             UartError::Gpio(gpio_err) => match gpio_err {
-                GpioError::UnknownModel => Error::new_io_error(IoErrorKind::Other, "unknown model"),
+                GpioError::UnknownModel => {
+                    Error::new_io_error(IoErrorKind::Other, "unknown model")
+                },
                 GpioError::PinNotAvailable(pin) => Error::new_io_error(
                     IoErrorKind::AddrNotAvailable,
                     format!("pin number {} is not available", pin),
@@ -127,9 +123,13 @@ impl From<UartError> for Error {
                     format!("permission denied: {} ", err_string),
                 ),
                 GpioError::Io(error) => Error::from(error),
-                GpioError::ThreadPanic => Error::new_io_error(IoErrorKind::Other, "thread panic"),
+                GpioError::ThreadPanic => {
+                    Error::new_io_error(IoErrorKind::Other, "thread panic")
+                },
             },
-            UartError::InvalidValue => Error::new_io_error(IoErrorKind::Other, "invalid value"),
+            UartError::InvalidValue => {
+                Error::new_io_error(IoErrorKind::Other, "invalid value")
+            },
         }
     }
 }
