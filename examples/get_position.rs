@@ -19,7 +19,7 @@ use raestro::prelude::*;
 
 fn main() -> () {
     let mut maestro: Maestro = Maestro::new();
-    maestro.start(BaudRates::BR_115200).unwrap();
+    maestro.start(Baudrate::BR_115200).unwrap();
 
     let channel: Channels = Channels::C_0;
 

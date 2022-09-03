@@ -96,23 +96,9 @@
 //! }
 //! ```
 
-pub mod constants;
-mod errors;
-mod maestro;
-pub mod prelude;
-mod utils;
-#[cfg(test)]
-mod tests {
-    use crate::constants::*;
-    use crate::maestro::*;
+pub mod maestro;
+pub mod errors;
 
-    #[test]
-    fn init_and_close() -> () {
-        let mut maestro: Maestro = Maestro::new();
-        maestro.start(BaudRates::BR_115200).unwrap();
-        maestro.close();
-    }
-}
-
-pub use errors::*;
-pub use maestro::*;
+/// ### Purpose:
+/// The global [`Result`] type to be used throughout the application.
+pub type Result<T> = std::result::Result<T, crate::errors::Error>;

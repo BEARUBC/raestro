@@ -5,15 +5,13 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::error::Error as StdError;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result as FmtResult;
-use std::io::Error as IoError;
-use std::io::ErrorKind as IoErrorKind;
+//! The crate-wide errors definition.
 
-use rppal::gpio::Error as GpioError;
-use rppal::uart::Error as UartError;
+use std::io;
+
+use derive_more::Display;
+use rppal::gpio;
+use rppal::uart;
 
 /// The custom `raestro` error type.
 ///
@@ -23,112 +21,101 @@ use rppal::uart::Error as UartError;
 /// converted into their underlying
 /// `std::io::Error` instances, and then wrapped
 /// in the `Error::Io` variant.
-#[derive(Debug)]
+#[derive(Display, Debug)]
 pub enum Error {
+    /// ### Purpose:
     /// The `maestro` instance is in an
     /// `uninitialized` state.
-    ///
-    /// Consider calling `Maestro::start` with a
-    /// corresponding baudrate to transition
-    /// this instance into the `initialized`
-    /// state.
+    #[display(fmt = "Maestro struct is uninitialized.")]
     Uninitialized,
 
-    /// An invalid value was passed in as a
-    /// parameter.
-    ///
-    /// Mainly used when an incorrect microsecond
-    /// target was passed into `set_target`.
+    /// ### Purpose:
+    /// An invalid value was passed in as a parameter. Mainly used when an
+    /// incorrect microsecond target was passed into `set_target`.
+    #[display(
+        fmt = "Target must be between 3968 quarter-us (992us) and 8000 quarter-us (2000us) but {} quarter-us was used.",
+        _0
+    )]
     InvalidValue(u16),
 
+    /// ### Purpose:
     /// Occurs when the expected number of bytes
-    /// received from the Maestro do not
-    /// equal `RESPONSE_SIZE`.
-    ///
-    /// `FaultyRead.0` is the number of bytes
-    /// actually read.
+    /// received from the Maestro board does not
+    /// equal [`crate::maestro::internals::RESPONSE_SIZE`].
+    #[display(
+        fmt = "2 bytes were expected to be read but only {} byte(s) were actually read.",
+        actual_count
+    )]
     FaultyRead {
-        #[allow(missing_docs)]
+        /// ### Purpose:
+        /// The number of bytes actually read.
         actual_count: usize,
     },
 
+    /// ### Purpose:
     /// Occurs when the expected number of bytes
     /// written to the Maestro were incorrect
     /// (according to the protocol being sent).
+    #[display(
+        fmt = "{} bytes were expected to be written, but only {} byte(s) were actually written.",
+        actual_count,
+        expected_count
+    )]
     FaultyWrite {
-        #[allow(missing_docs)]
+        /// ### Purpose:
+        /// Number of bytes actually written.
         actual_count: usize,
 
-        #[allow(missing_docs)]
+        /// ### Purpose:
+        /// Number of bytes expected to be written.
         expected_count: usize,
     },
 
-    /// Remaining IO errors as encountered by the
-    /// `rppal` library, or something else.
-    Io(IoError),
+    /// ### Purpose:
+    /// Any [`std::io::Error`] encountered.
+    #[display(fmt = "{}", _0)]
+    Io(io::Error),
 }
 
 #[doc(hidden)]
 impl Error {
-    /// Constructs a `std::io::Error` from the
-    /// given parameters.
-    pub(crate) fn new_io_error<E>(err_kind: IoErrorKind, err_msg: E) -> Self
+    /// ### Purpose:
+    /// Constructs a [`std::io::Error`] from the given parameters.
+    fn new_io_error<E>(err_kind: io::ErrorKind, err_msg: E) -> Self
     where
-        E: Into<Box<dyn StdError + Send + Sync>>,
+        E: Into<Box<dyn std::error::Error + Send + Sync>>,
     {
-        Error::Io(IoError::new(err_kind, err_msg))
+        Self::Io(io::Error::new(err_kind, err_msg))
     }
 }
 
-impl StdError for Error {}
+impl std::error::Error for Error {}
 
-impl Display for Error {
-    /// Formatting for `raestro::Error`.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match self {
-            Error::Uninitialized => write!(f, "maestro struct is uninitialized; please consider calling .start() on the instance first"),
-            Error::InvalidValue(value) => write!(f, "target must be between 3968 quarter-us (992us) and 8000 quarter-us (2000us) but {} quarter-us was used", value),
-            Error::FaultyRead { actual_count, } => write!(f, "2 bytes were expected to be read, but only {} byte(s) were actually read", actual_count),
-            Error::FaultyWrite { actual_count, expected_count, } => write!(f, "{} bytes were expected to be written, but only {} byte(s) were actually written", expected_count, actual_count),
-            Error::Io(io_error) => io_error.fmt(f),
-        }
-    }
-}
-
-impl From<IoError> for Error {
-    /// Wraps a `std::io::Error` in the
-    /// `raestro::Error::Io` variant.
-    fn from(io_error: IoError) -> Self {
-        Self::Io(io_error)
-    }
-}
-
-impl From<UartError> for Error {
-    /// Used to convert from an
-    /// `rppal::uart::Error` type into the
-    /// `raestro::Error`.
-    fn from(uart_error: UartError) -> Self {
+impl From<uart::Error> for Error {
+    fn from(uart_error: uart::Error) -> Self {
         match uart_error {
-            UartError::Io(std_err) => Error::from(std_err),
-            UartError::Gpio(gpio_err) => match gpio_err {
-                GpioError::UnknownModel => {
-                    Error::new_io_error(IoErrorKind::Other, "unknown model")
+            uart::Error::Io(err) => Self::Io(err),
+            uart::Error::Gpio(gpio_err) => match gpio_err {
+                gpio::Error::UnknownModel => {
+                    Self::new_io_error(io::ErrorKind::Other, "Unknown model.")
                 },
-                GpioError::PinNotAvailable(pin) => Error::new_io_error(
-                    IoErrorKind::AddrNotAvailable,
-                    format!("pin number {} is not available", pin),
+                gpio::Error::PinNotAvailable(pin) => Self::new_io_error(
+                    io::ErrorKind::AddrNotAvailable,
+                    format!("Pin number {} is not available.", pin),
                 ),
-                GpioError::PermissionDenied(err_string) => Error::new_io_error(
-                    IoErrorKind::PermissionDenied,
-                    format!("permission denied: {} ", err_string),
-                ),
-                GpioError::Io(error) => Error::from(error),
-                GpioError::ThreadPanic => {
-                    Error::new_io_error(IoErrorKind::Other, "thread panic")
+                gpio::Error::PermissionDenied(err_string) => {
+                    Self::new_io_error(
+                        io::ErrorKind::PermissionDenied,
+                        format!("Permission denied: {}.", err_string),
+                    )
+                },
+                gpio::Error::Io(err) => Self::Io(err),
+                gpio::Error::ThreadPanic => {
+                    Self::new_io_error(io::ErrorKind::Other, "Thread panic.")
                 },
             },
-            UartError::InvalidValue => {
-                Error::new_io_error(IoErrorKind::Other, "invalid value")
+            uart::Error::InvalidValue => {
+                Self::new_io_error(io::ErrorKind::Other, "Invalid value.")
             },
         }
     }
