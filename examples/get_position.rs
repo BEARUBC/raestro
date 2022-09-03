@@ -5,41 +5,30 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-// external crates
-
-// external uses
+use std::convert::TryInto;
 use std::thread;
 use std::time::Duration;
 
-use raestro::prelude::*;
+use raestro::maestro;
 
-// internal mods
-
-// internal uses
-
-fn main() -> () {
-    let mut maestro: Maestro = Maestro::new();
-    maestro.start(Baudrate::BR_115200).unwrap();
-
-    let channel: Channels = Channels::C_0;
-
-    let target_min = 3968u16;
-    let target_max = 8000u16;
-
-    let sleep_time = Duration::from_millis(1000u64);
-
-    #[allow(unused_assignments)]
-    let mut current_position: Option<u16> = None;
-
+fn main() -> ! {
+    let mut maestro: maestro::Maestro = maestro::builder::Builder::default()
+        .baudrate(maestro::constants::Baudrate::Baudrate11520)
+        .block_duration(Duration::from_millis(100))
+        .try_into()
+        .unwrap();
+    let channel = maestro::constants::Channels::Channel0;
+    let pos_min = maestro::constants::MIN_QTR_PWM;
+    let pos_max = maestro::constants::MAX_QTR_PWM;
+    let sleep_duration = Duration::from_secs(1);
     loop {
-        maestro.set_target(channel, target_min).unwrap();
-        current_position = Some(maestro.get_position(channel).unwrap());
-        assert_eq!(current_position.unwrap(), target_min);
-        thread::sleep(sleep_time);
-
-        maestro.set_target(channel, target_max).unwrap();
-        current_position = Some(maestro.get_position(channel).unwrap());
-        assert_eq!(current_position.unwrap(), target_max);
-        thread::sleep(sleep_time);
+        maestro.set_target(channel, pos_min).unwrap();
+        let position = maestro.get_position(channel).unwrap();
+        assert_eq!(position, pos_min);
+        thread::sleep(sleep_duration);
+        maestro.set_target(channel, pos_max).unwrap();
+        let position = maestro.get_position(channel).unwrap();
+        assert_eq!(position, pos_max);
+        thread::sleep(sleep_duration);
     }
 }

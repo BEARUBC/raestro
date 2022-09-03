@@ -5,22 +5,20 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-//! The main source module for the [`Maestro`] struct, as well as all related definitions.
+//! The main source module for the [`Maestro`] struct, as well as all related
+//! definitions.
 
 pub mod builder;
-pub mod intrinsics;
+pub mod constants;
 mod internals;
 mod utils;
 
 use std::cmp::Ordering;
-use std::convert::TryFrom;
 
-use rppal::uart::Parity;
 use rppal::uart::Uart;
 
 use crate::errors::Error;
-use crate::maestro::builder::Builder;
-use crate::maestro::intrinsics::MaestroError;
+use crate::maestro::constants::ErrorValues;
 use crate::maestro::utils::mask_byte;
 use crate::maestro::utils::microsec_to_target;
 
@@ -32,36 +30,6 @@ pub struct Maestro {
     uart: Uart,
     read_buf: [u8; internals::BUFFER_SIZE],
     write_buf: [u8; internals::BUFFER_SIZE],
-}
-
-impl TryFrom<Builder> for Maestro {
-    type Error = crate::errors::Error;
-
-    fn try_from(
-        Builder {
-            baudrate,
-            block_duration,
-        }: Builder,
-    ) -> Result<Self, Self::Error> {
-        let baudrate = baudrate.ok_or_else(|| Error::Uninitialized)? as u32;
-        let mut uart = Uart::new(
-            baudrate,
-            Parity::None,
-            internals::DATA_BITS,
-            internals::STOP_BITS,
-        )?;
-        block_duration
-            .map(|block_duration| uart.set_read_mode(0u8, block_duration))
-            .transpose()?;
-        let read_buf = [0u8; internals::BUFFER_SIZE];
-        let write_buf = [0u8; internals::BUFFER_SIZE];
-        let maestro = Self {
-            uart,
-            read_buf,
-            write_buf,
-        };
-        Ok(maestro)
-    }
 }
 
 impl Maestro {
@@ -96,11 +64,11 @@ impl Maestro {
     /// ```
     pub fn set_target(
         &mut self,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
         target: u16,
     ) -> crate::Result<()> {
         let contained =
-            (intrinsics::MIN_QTR_PWM..=intrinsics::MAX_QTR_PWM).contains(&target);
+            (constants::MIN_QTR_PWM..=constants::MAX_QTR_PWM).contains(&target);
         match contained {
             true => Ok(()),
             false => Err(Error::InvalidValue(target)),
@@ -133,7 +101,7 @@ impl Maestro {
     /// ```
     pub fn set_speed(
         &mut self,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
         speed: u16,
     ) -> crate::Result<()> {
         self.write_channel_and_payload(
@@ -176,7 +144,7 @@ impl Maestro {
     /// ```
     pub fn set_acceleration(
         &mut self,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
         acceleration: u8,
     ) -> crate::Result<()> {
         let acceleration = acceleration as u16;
@@ -281,7 +249,7 @@ impl Maestro {
     /// ```
     pub fn get_position(
         &mut self,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
     ) -> crate::Result<u16> {
         self.write_channel(internals::CommandFlags::GetPosition, channel)?;
         self.read(internals::RESPONSE_SIZE as usize)?;
@@ -310,11 +278,11 @@ impl Maestro {
     ///
     /// let errors = m.get_errors().unwrap();
     /// ```
-    pub fn get_errors(&mut self) -> crate::Result<Vec<MaestroError>> {
+    pub fn get_errors(&mut self) -> crate::Result<Vec<ErrorValues>> {
         self.write_command(internals::CommandFlags::GetErrors)?;
         self.read(internals::RESPONSE_SIZE as usize)?;
         let data = self.prepare_data_from_buffer();
-        let errors = MaestroError::from_data(data);
+        let errors = ErrorValues::from_data(data);
         Ok(errors)
     }
 
@@ -383,7 +351,7 @@ impl Maestro {
     fn write_channel_and_payload(
         &mut self,
         command_flag: internals::CommandFlags,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
         microsec: u16,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
@@ -411,7 +379,7 @@ impl Maestro {
     fn write_channel(
         &mut self,
         command_flag: internals::CommandFlags,
-        channel: intrinsics::Channels,
+        channel: constants::Channels,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
         let length = 4usize;

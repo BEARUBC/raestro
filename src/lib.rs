@@ -96,8 +96,8 @@
 //! }
 //! ```
 
-pub mod maestro;
 pub mod errors;
+pub mod maestro;
 
 /// ### Purpose:
 /// The global [`Result`] type to be used throughout the application.

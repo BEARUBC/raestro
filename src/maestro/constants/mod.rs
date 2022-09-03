@@ -5,7 +5,8 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-//! Available public constants for the operation of the [`crate::maestro::Maestro`] struct.
+//! Available public constants for the operation of the
+//! [`crate::maestro::Maestro`] struct.
 
 #[cfg(test)]
 mod tests;
@@ -80,7 +81,7 @@ pub enum Baudrate {
 #[derive(PartialEq)]
 #[cfg_attr(test, derive(Debug))]
 #[repr(u16)]
-pub enum MaestroError {
+pub enum ErrorValues {
     /// A hardware-level error that occurs when a byte’s stop bit is not
     /// detected at the expected place. This can occur if you are communicating
     /// at a baud rate that differs from the Maestro’s baud rate.
@@ -163,7 +164,7 @@ pub enum MaestroError {
     ScriptPcError = 8u16,
 }
 
-impl MaestroError {
+impl ErrorValues {
     /// ### Purpose:
     /// Converts the [`u16`] returned from the
     /// Maestro that represents an error into a
@@ -175,7 +176,7 @@ impl MaestroError {
     /// that specific error was encountered. There exist only 9 possible
     /// Maestro errors, and as such, only the first 9 bits (bit-0 to bit-8)
     /// can be set in the [`u16`]. All other bits are ignored.
-    pub fn from_data(data: u16) -> Vec<MaestroError> {
+    pub fn from_data(data: u16) -> Vec<ErrorValues> {
         const MASK: u16 = 0x0001u16;
         let (_, errors) = (0u16..=8u16).into_iter().fold(
             (data, vec![]),
@@ -194,7 +195,7 @@ impl MaestroError {
     }
 }
 
-impl From<u16> for MaestroError {
+impl From<u16> for ErrorValues {
     /// ### Purpose:
     /// Converts a raw [`u16`] into an [`Errors`] type.
     ///
@@ -204,8 +205,8 @@ impl From<u16> for MaestroError {
     /// conversion should not result in any
     /// undefined or erroneous behaviour.
     fn from(data: u16) -> Self {
-        let contained = ((MaestroError::SerSignalError as u16)
-            ..=(MaestroError::ScriptPcError as u16))
+        let contained = ((ErrorValues::SerSignalError as u16)
+            ..=(ErrorValues::ScriptPcError as u16))
             .contains(&data);
         match contained {
             true => unsafe { std::mem::transmute(data) },
