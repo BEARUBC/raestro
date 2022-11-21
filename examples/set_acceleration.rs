@@ -9,17 +9,22 @@ use std::convert::TryInto;
 use std::thread;
 use std::time::Duration;
 
-use raestro::maestro;
+use raestro::maestro::builder::Builder;
+use raestro::maestro::constants::Baudrate;
+use raestro::maestro::constants::Channels;
+use raestro::maestro::constants::MAX_QTR_PWM;
+use raestro::maestro::constants::MIN_QTR_PWM;
+use raestro::maestro::Maestro;
 
 fn main() -> ! {
-    let mut maestro: maestro::Maestro = maestro::builder::Builder::default()
-        .baudrate(maestro::constants::Baudrate::Baudrate11520)
+    let mut maestro: Maestro = Builder::default()
+        .baudrate(Baudrate::Baudrate11520)
         .block_duration(Duration::from_millis(100))
         .try_into()
         .unwrap();
-    let channel = maestro::constants::Channels::Channel0;
-    let pos_min = maestro::constants::MIN_QTR_PWM;
-    let pos_max = maestro::constants::MAX_QTR_PWM;
+    let channel = Channels::Channel0;
+    let pos_min = MIN_QTR_PWM;
+    let pos_max = MAX_QTR_PWM;
     let accel_min = 1u8;
     let accel_max = 255u8;
     let sleep_duration = Duration::from_secs(1);
