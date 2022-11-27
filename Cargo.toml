@@ -1,6 +1,6 @@
 [package]
 name = "raestro"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.com>"]
 edition = "2021"
 license = "MIT"

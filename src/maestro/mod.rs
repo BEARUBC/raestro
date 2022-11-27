@@ -56,8 +56,8 @@ impl Maestro {
     ///     .block_duration(Duration::from_secs(10))
     ///     .try_into()?;
     ///
-    /// // can be any arbitrary channel in the Channels enum
-    /// let channel: Channels = Channels::C_0;
+    /// // can be any arbitrary channel in the Channel enum
+    /// let channel: Channel = Channel::C_0;
     ///
     /// // can be any value between 3968 and 8000
     /// // 4000 quarter microsecs would be 1000us, thus this example sets a target of 1000us
@@ -67,7 +67,7 @@ impl Maestro {
     /// ```
     pub fn set_target(
         &mut self,
-        channel: constants::Channels,
+        channel: constants::Channel,
         target: u16,
     ) -> crate::Result<()> {
         let contained =
@@ -97,14 +97,14 @@ impl Maestro {
     ///     .block_duration(Duration::from_secs(10))
     ///     .try_into()?;
     ///
-    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let channel: Channel = Channel::C_0; // can be any arbitrary channel in the Channel enum
     /// let speed = 10u16;
     ///
     /// m.set_speed(channel, speed);
     /// ```
     pub fn set_speed(
         &mut self,
-        channel: constants::Channels,
+        channel: constants::Channel,
         speed: u16,
     ) -> crate::Result<()> {
         self.write_channel_and_payload(
@@ -140,14 +140,14 @@ impl Maestro {
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let channel: Channel = Channel::C_0; // can be any arbitrary channel in the Channel enum
     /// let acceleration = 10u8;
     ///
     /// m.set_acceleration(channel, acceleration);
     /// ```
     pub fn set_acceleration(
         &mut self,
-        channel: constants::Channels,
+        channel: constants::Channel,
         acceleration: u8,
     ) -> crate::Result<()> {
         let acceleration = acceleration as u16;
@@ -241,7 +241,7 @@ impl Maestro {
     /// let mut m = Maestro::new();
     /// m.start(BaudRates::BR_115200).unwrap();
     ///
-    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
+    /// let channel: Channel = Channel::C_0; // can be any arbitrary channel in the Channel enum
     /// let target = 4000u16; // can be any value between 3968u16 and 8000u16
     ///
     /// m.set_target(channel, target);
@@ -252,7 +252,7 @@ impl Maestro {
     /// ```
     pub fn get_position(
         &mut self,
-        channel: constants::Channels,
+        channel: constants::Channel,
     ) -> crate::Result<u16> {
         self.write_channel(internals::CommandFlags::GetPosition, channel)?;
         self.read(internals::RESPONSE_SIZE as usize)?;
@@ -354,7 +354,7 @@ impl Maestro {
     fn write_channel_and_payload(
         &mut self,
         command_flag: internals::CommandFlags,
-        channel: constants::Channels,
+        channel: constants::Channel,
         microsec: u16,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
@@ -382,7 +382,7 @@ impl Maestro {
     fn write_channel(
         &mut self,
         command_flag: internals::CommandFlags,
-        channel: constants::Channels,
+        channel: constants::Channel,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
         let length = 4usize;
