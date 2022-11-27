@@ -12,7 +12,7 @@ readme = "README.md"
 [dependencies]
 # --- Purpose:
 # Raspberry Pi utils for UART, PWM, I2C, etc.
-rppal = "0.13.1"
+rppal = "0.14.1"
 
 # --- Purpose:
 # Display utilities.
