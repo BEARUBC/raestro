@@ -30,10 +30,15 @@ pub const MIN_QTR_PWM: u16 = 3968u16;
 pub const MAX_QTR_PWM: u16 = 8000u16;
 
 /// ### Purpose:
+/// Maximum number of channels on the Maestro.
+const CHANNEL_COUNT: u8 = 6u8;
+
+/// ### Purpose:
 /// All available channels to send commands to.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
+#[cfg_attr(test, derive(Debug))]
 #[repr(u8)]
-pub enum Channels {
+pub enum Channel {
     #[allow(missing_docs)]
     Channel0 = 0x0u8,
 
@@ -51,6 +56,28 @@ pub enum Channels {
 
     #[allow(missing_docs)]
     Channel5 = 0x5u8,
+}
+
+impl Default for Channel {
+    fn default() -> Self {
+        Self::Channel0
+    }
+}
+
+impl Iterator for Channel {
+    type Item = Channel;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let channel = *self as u8;
+        match channel {
+            _ if channel == CHANNEL_COUNT - 1 => None,
+            _ => {
+                let channel = channel + 1;
+                let channel = unsafe { std::mem::transmute(channel) };
+                Some(channel)
+            },
+        }
+    }
 }
 
 /// ### Purpose:

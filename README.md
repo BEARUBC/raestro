@@ -80,7 +80,7 @@ use std::time::Duration;
 
 use raestro::maestro::builder::Builder;
 use raestro::maestro::constants::Baudrate;
-use raestro::maestro::constants::Channels;
+use raestro::maestro::constants::Channel
 use raestro::maestro::constants::MAX_QTR_PWM;
 use raestro::maestro::constants::MIN_QTR_PWM;
 use raestro::maestro::Maestro;
@@ -93,7 +93,7 @@ fn main() -> ! {
         .try_into()
         .expect("Failed to build a `maestro` instance.");
 
-    let channel = Channels::Channel0;
+    let channel = Channel::Channel0;
     let pos_min = MIN_QTR_PWM;
     let pos_max = MAX_QTR_PWM;
     let sleep_duration = Duration::from_secs(1);

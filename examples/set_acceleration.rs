@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use raestro::maestro::builder::Builder;
 use raestro::maestro::constants::Baudrate;
-use raestro::maestro::constants::Channels;
+use raestro::maestro::constants::Channel;
 use raestro::maestro::constants::MAX_QTR_PWM;
 use raestro::maestro::constants::MIN_QTR_PWM;
 use raestro::maestro::Maestro;
@@ -22,7 +22,7 @@ fn main() -> ! {
         .block_duration(Duration::from_millis(100))
         .try_into()
         .unwrap();
-    let channel = Channels::Channel0;
+    let channel = Channel::Channel0;
     let pos_min = MIN_QTR_PWM;
     let pos_max = MAX_QTR_PWM;
     let accel_min = 1u8;
