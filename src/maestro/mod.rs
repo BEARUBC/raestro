@@ -51,16 +51,19 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
-    /// use raestro::prelude::*;
+    /// let maestro: Maestro = Builder::default()
+    ///     .baudrate(Baudrate::Baudrate50)
+    ///     .block_duration(Duration::from_secs(10))
+    ///     .try_into()?;
     ///
-    /// let mut m = Maestro::new();
-    /// m.start(BaudRates::BR_115200).unwrap();
+    /// // can be any arbitrary channel in the Channels enum
+    /// let channel: Channels = Channels::C_0;
     ///
-    /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
-    /// let qtr_microsec = 4000u16; // can be any value between 3968 and 8000
+    /// // can be any value between 3968 and 8000
     /// // 4000 quarter microsecs would be 1000us, thus this example sets a target of 1000us
+    /// let qtr_microsec = 4000u16;
     ///
-    /// m.set_target(channel, qtr_microsec);
+    /// maestro.set_target(channel, qtr_microsec);
     /// ```
     pub fn set_target(
         &mut self,
@@ -89,10 +92,10 @@ impl Maestro {
     ///
     /// # Example Usage
     /// ```
-    /// use raestro::prelude::*;
-    ///
-    /// let mut m = Maestro::new();
-    /// m.start(BaudRates::BR_115200).unwrap();
+    /// let maestro: Maestro = Builder::default()
+    ///     .baudrate(Baudrate::Baudrate50)
+    ///     .block_duration(Duration::from_secs(10))
+    ///     .try_into()?;
     ///
     /// let channel: Channels = Channels::C_0; // can be any arbitrary channel in the Channels enum
     /// let speed = 10u16;
