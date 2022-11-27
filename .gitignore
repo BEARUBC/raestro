@@ -1,2 +1,4 @@
+# cargo artefacts
 /target
 Cargo.lock
+.vscode
