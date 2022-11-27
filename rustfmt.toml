@@ -27,15 +27,15 @@ trailing_comma = "Vertical"
 match_block_trailing_comma = true
 
 # Function
-fn_single_line = true
+fn_single_line = false
 fn_args_layout = "Tall"
 # fn_call_width = 60
 force_multiline_blocks = false
 
 # Imports
 reorder_imports = true
-imports_granularity = "Crate"
-imports_layout = "Vertical"
+imports_granularity = "Item"
+imports_layout = "Horizontal"
 imports_indent = "Block"
 group_imports = "StdExternalCrate"
 
@@ -43,7 +43,7 @@ group_imports = "StdExternalCrate"
 normalize_comments = true
 wrap_comments = true
 normalize_doc_attributes = true
-comment_width = 50
+comment_width = 100
 # report_todo = "Unnumbered"
 # report_fixme = "Unnumbered"
 
@@ -57,10 +57,10 @@ edition = "2018"
 use_field_init_shorthand = true
 
 # General
-max_width = 100
+max_width = 80
 use_small_heuristics = "Default"
 overflow_delimited_expr = true
-blank_lines_upper_bound = 2
+blank_lines_upper_bound = 1
 
 # Ignored
 ignore = []

@@ -1,8 +1,8 @@
 [package]
 name = "raestro"
-version = "0.3.0"
-authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.com>", "KelvinKCLee <leekachunkelvin@gmail.com>", "bzhou64 <billzhou64@gmail.com>", "panchalmaharshi8 <panchalmaharshi8@gmail.com>"]
-edition = "2018"
+version = "0.4.0"
+authors = ["nathan-n-poon <nathannpoon@gmail.com>", "raunakab <rabhagat31@gmail.com>"]
+edition = "2021"
 license = "MIT"
 description = "A Rust-flavoured API Interface for the Pololu Micro-Maestro (6-Channel) Servo Controller Board. Developed for the Raspberry Pi"
 repository = "https://github.com/BEARUBC/raestro"
@@ -10,9 +10,13 @@ keywords = ["pololu", "maestro", "6-channel", "servo-controller", "raspberry-pi"
 readme = "README.md"
 
 [dependencies]
-# rppal
-# rpi utils for UART, PWM, I2C, etc.
-rppal = "0.11.3"
+# --- Purpose:
+# Raspberry Pi utils for UART, PWM, I2C, etc.
+rppal = "0.13.1"
+
+# --- Purpose:
+# Display utilities.
+derive_more = "0.99.17"
 
 [[example]]
 name = "set_target"    # The name of the target.

@@ -4,7 +4,8 @@
 [![docs](https://docs.rs/raestro/badge.svg)](https://docs.rs/crate/raestro)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-`raestro` is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
+`raestro` provides an easy-to-use interface to communicate with the 6-Channel Maestro.
+It is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
 
 ## Table of Contents
 - [Prelude](#Prelude)
@@ -16,7 +17,13 @@
 - [Usage](#Usage)
 
 ## Prelude
-This library is developed specifically for the Raspberry Pi, which acts as the main computer system on our bionic arm. Builds on different architectures will not be guaranteed to work.
+Before continuing, please take note of the following points:
+
+-
+	This library is developed specifically for the Raspberry Pi.
+-
+	Please take caution in wiring the Pololu Micro Maestro to the Raspberry Pi.
+	Incorrect wiring may lead to permanent hardware damage.
 
 ## Documentation
 All public exports have been properly documented with examples for usage of critical APIs.
@@ -26,22 +33,34 @@ Included below is a minimal example of how to setup your environment and build a
 ## Getting Started
 
 ### Hardware Setup
-1. Connect the power and ground lines from the Raspberry Pi to the Maestro.
-2. Connect the Raspberry Pi's TX and RX pins to the Maestro's RX and TX pins, respectively. Please note the order in which the pins need to be connected (the Pi's TX connected to the Maestro's RX and the Pi's RX connected to the Maestro's TX).
-3. Connect the power lines for the servos. Documentation on which line is which is available readily online.
-4. Connect up to 6 servos to one of the pin-triples available (the backside of the board has more info on each pin-type).
+1.
+	Connect the power and ground lines from the Raspberry Pi to the Maestro.
+2.
+	Connect the Raspberry Pi's TX and RX pins to the Maestro's RX and TX pins, respectively.
+	Please note the order in which the pins need to be connected (the Pi's TX connected to the Maestro's RX and the Pi's RX connected to the Maestro's TX).
+3.
+	Connect the power lines for the servos.
+	Documentation on which line is which is available readily online.
+4.
+	Connect up to 6 servos to one of the pin-triples available (the backside of the board has more info on each pin-type).
 
 ### Software Setup
 The Rust crate `rppal` provides user-level APIs for protocols such as `PWM`, `I2C`, and `UART`.
 In order to configure `UART` for the Raspberry Pi, do the following:
-1. Remove `console=serial0,11520` from `/boot/cmdline.txt`
-2. Disable the Bluetooth by:
+
+1.
+	Remove `console=serial0,11520` from `/boot/cmdline.txt`
+2.
+	Disable the Bluetooth by:
 	* Adding `dtoverlay=pi3-disable-bt` to `/boot/config.txt`
 		* For the RPi4 models, do this by adding `dtoverlay=disable-bt` instead
 		* Rebooting the Pi (by powering it off and then on again)
 	* Running the command `sudo systemctl disable hciuart`
 
 ### Trouble-shooting
+If permission denied errors are being observed, please inspect your user's permissions.
+More specifically, your user must be added to group `dialout`.
+
 If `cargo build` or `cargo test` do not work because of the `rppal` dependency, check the `rppal` documentations on how to set up `UART`.
 The link is [here](https://docs.rs/rppal/0.11.3/rppal/uart/index.html).
 
@@ -51,27 +70,50 @@ Add the following to your `Cargo.toml` file:
 [dependencies]
 raestro = "0.3.0"
 ```
-Create a new `maestro` instance and initialize it by calling `Maestro::start`.
+
+Finally, create a new `maestro` instance and initialize it by calling `Maestro::start`.
 This initialized struct can now be utilized to perform reads and writes to and from the Micro-Maestro 6-Channel.
 ```rust
-use raestro::prelude::*;
+use std::convert::TryInto;
+use std::thread;
+use std::time::Duration;
 
-fn main() -> () {
-	let mut maestro: Maestro = Maestro::new();
-	maestro.start(BaudRates::BR_115200).unwrap();
-    
-	let channel = Channels::C_0;
+use raestro::maestro::builder::Builder;
+use raestro::maestro::constants::Baudrate;
+use raestro::maestro::constants::Channels;
+use raestro::maestro::constants::MAX_QTR_PWM;
+use raestro::maestro::constants::MIN_QTR_PWM;
+use raestro::maestro::Maestro;
 
-	// the position is in microseconds and can only be between 992 and 2000
-	// the set_target method takes in a target in quarter microseconds, so multiply the desired value by 4
-	// (specifically for the Pololu Micro-Maestro 6-Channel Board)
-	let target = 3968u16;
+fn main() -> ! {
+	// Create a new `Maestro` instance by configuring a `Builder`.
+    let mut maestro: Maestro = Builder::default()
+        .baudrate(Baudrate::Baudrate11520)
+        .block_duration(Duration::from_millis(100))
+        .try_into()
+        .expect("Failed to build a `maestro` instance.");
 
-	maestro.set_target(channel, target).unwrap();
+    let channel = Channels::Channel0;
+    let pos_min = MIN_QTR_PWM;
+    let pos_max = MAX_QTR_PWM;
+    let sleep_duration = Duration::from_secs(1);
 
-	let actual_position = maestro.get_position(channel).unwrap();
-	
-	assert_eq!(target, actual_position);
+	// Set the initial position of the servo at the specified channel to the specified location!
+	maestro.set_target(channel, pos_min).unwrap();
+	let position = maestro.get_position(channel).unwrap();
+
+	// Assert that the requested position is truly being broadcast on the requested channel.
+	assert_eq!(position, pos_min);
+	thread::sleep(sleep_duration);
+
+	// Move the servo back!
+	maestro.set_target(channel, pos_max).unwrap();
+	let position = maestro.get_position(channel).unwrap();
+
+	// Once again, assert that the requested position is truly being broadcast on the requested channel.
+	assert_eq!(position, pos_max);
+	thread::sleep(sleep_duration);
 }
+
 ```
 More examples of API usage are provided in the `examples` folder.
