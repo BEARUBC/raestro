@@ -68,7 +68,7 @@ The link is [here](https://docs.rs/rppal/0.11.3/rppal/uart/index.html).
 Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
-raestro = "0.3.0"
+raestro = "0.5.0"
 ```
 
 Finally, create a new `maestro` instance and initialize it by calling `Maestro::start`.
