@@ -6,6 +6,9 @@ pub(super) const DEVICE_NUMBER: u8 = 0x0cu8;
 pub(super) const DATA_BITS: u8 = 8u8;
 pub(super) const STOP_BITS: u8 = 1u8;
 pub(super) const MIN_WRITE_LENGTH: usize = 3usize;
+pub(super) const WRITE_COMMAND_SIZE: usize = 3usize;
+pub(super) const WRITE_CHANNEL_SIZE: usize = 4usize;
+pub(super) const WRITE_CHANNEL_AND_PAYLOAD_SIZE: usize = 6usize;
 pub(super) const RESPONSE_SIZE: u8 = 2u8;
 
 /// ### Purpose:

@@ -70,14 +70,12 @@ impl Maestro {
         channel: constants::Channel,
         target: u16,
     ) -> crate::Result<()> {
-        let contained =
-            (constants::MIN_QTR_PWM..=constants::MAX_QTR_PWM).contains(&target);
-        match contained {
-            true => Ok(()),
-            false => Err(Error::InvalidValue(target)),
-        }?;
+        (constants::MIN_QTR_PWM..=constants::MAX_QTR_PWM)
+            .contains(&target)
+            .then(|| ())
+            .ok_or_else(|| Error::InvalidValue(target))?;
         self.write_channel_and_payload(
-            internals::CommandFlags::GetPosition,
+            internals::CommandFlags::SetTarget,
             channel,
             target,
         )
@@ -330,7 +328,7 @@ impl Maestro {
             uart, write_buf, ..
         } = self;
         let mut slice = &mut write_buf[0..length];
-        let bytes_written = uart.read(&mut slice)?;
+        let bytes_written = uart.write(&mut slice)?;
         let comparison = bytes_written.cmp(&length);
         match comparison {
             Ordering::Equal => Ok(()),
@@ -358,14 +356,13 @@ impl Maestro {
         microsec: u16,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
-        let length = 6usize;
         let command = mask_byte(command_flag as u8);
         let (lower, upper) = microsec_to_target(microsec);
         write_buf[2usize] = command;
         write_buf[3usize] = channel as u8;
         write_buf[4usize] = lower;
         write_buf[5usize] = upper;
-        self.write(length)
+        self.write(internals::WRITE_CHANNEL_AND_PAYLOAD_SIZE)
     }
 
     /// ### Purpose:
@@ -385,11 +382,10 @@ impl Maestro {
         channel: constants::Channel,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
-        let length = 4usize;
         let command = mask_byte(command_flag as u8);
         write_buf[2usize] = command;
         write_buf[3usize] = channel as u8;
-        self.write(length)
+        self.write(internals::WRITE_CHANNEL_SIZE)
     }
 
     /// ### Purpose:
@@ -407,10 +403,9 @@ impl Maestro {
         command_flag: internals::CommandFlags,
     ) -> crate::Result<()> {
         let Self { write_buf, .. } = self;
-        let length = 3usize;
         let command = mask_byte(command_flag as u8);
         write_buf[2usize] = command;
-        self.write(length)
+        self.write(internals::WRITE_COMMAND_SIZE)
     }
 
     /// ### Purpose:

@@ -80,11 +80,12 @@ impl TryFrom<Builder> for Maestro {
             internals::DATA_BITS,
             internals::STOP_BITS,
         )?;
-        block_duration
-            .map(|block_duration| uart.set_read_mode(0u8, block_duration))
-            .transpose()?;
+        let block_duration = block_duration.unwrap_or_default();
+        uart.set_read_mode(0u8, block_duration)?;
         let read_buf = [0u8; internals::BUFFER_SIZE];
-        let write_buf = [0u8; internals::BUFFER_SIZE];
+        let mut write_buf = [0u8; internals::BUFFER_SIZE];
+        write_buf[0usize] = internals::SYNC as u8;
+        write_buf[1usize] = internals::DEVICE_NUMBER as u8;
         let maestro = Self {
             uart,
             read_buf,
