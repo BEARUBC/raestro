@@ -113,7 +113,10 @@ impl From<uart::Error> for Error {
                 gpio::Error::ThreadPanic => {
                     Self::new_io_error(io::ErrorKind::Other, "Thread panic.")
                 },
-                gpio::Error::PinUsed(_) => Self::new_io_error(io::ErrorKind::AddrInUse, "That pin is already being used."),
+                gpio::Error::PinUsed(_) => Self::new_io_error(
+                    io::ErrorKind::AddrInUse,
+                    "That pin is already being used.",
+                ),
             },
             uart::Error::InvalidValue => {
                 Self::new_io_error(io::ErrorKind::Other, "Invalid value.")
