@@ -28,7 +28,7 @@ match_block_trailing_comma = true
 
 # Function
 fn_single_line = false
-fn_args_layout = "Tall"
+fn_params_layout = "Tall"
 # fn_call_width = 60
 force_multiline_blocks = false
 
