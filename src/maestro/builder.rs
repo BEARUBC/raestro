@@ -28,8 +28,10 @@ use rppal::uart::Uart;
 
 use crate::errors::Error;
 use crate::maestro::constants::Baudrate;
+use crate::maestro::constants::VIRTUAL_COMMAND_PORT;
 use crate::maestro::internals;
 use crate::maestro::Maestro;
+
 
 #[derive(Default)]
 /// ### Purpose:
@@ -43,6 +45,12 @@ pub struct Builder {
     /// ### Purpose:
     /// How long to wait for a response before quitting and returning.
     pub block_duration: Option<Duration>,
+
+    /// ### Purpose:
+    /// Indicates whether the Maestro is connected using USB.
+    pub using_usb_serial: bool,
+
+    
 }
 
 impl Builder {
@@ -62,6 +70,16 @@ impl Builder {
             ..self
         }
     }
+
+    /// ### Purpose:
+    /// Convenience function to configure whether or not to use USB serial to
+    /// communicate to the Maestro.
+    pub fn using_usb_serial(self, flag: bool) -> Self {
+        Self {
+            using_usb_serial: flag,
+            ..self
+        }
+    }
 }
 
 impl TryFrom<Builder> for Maestro {
@@ -71,15 +89,26 @@ impl TryFrom<Builder> for Maestro {
         Builder {
             baudrate,
             block_duration,
+            using_usb_serial,
         }: Builder,
     ) -> Result<Self, Self::Error> {
         let baudrate = baudrate.ok_or_else(|| Error::Uninitialized)? as u32;
-        let mut uart = Uart::new(
-            baudrate,
-            Parity::None,
-            internals::DATA_BITS,
-            internals::STOP_BITS,
-        )?;
+        let mut uart = if using_usb_serial {
+            Uart::with_path(
+                VIRTUAL_COMMAND_PORT,
+                baudrate,
+                Parity::None,
+                internals::DATA_BITS,
+                internals::STOP_BITS,
+            )?;
+        } else {
+            Uart::new(
+                baudrate,
+                Parity::None,
+                internals::DATA_BITS,
+                internals::STOP_BITS,
+            )?;
+        };
         let block_duration = block_duration.unwrap_or_default();
         uart.set_read_mode(0u8, block_duration)?;
         let read_buf = [0u8; internals::BUFFER_SIZE];

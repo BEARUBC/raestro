@@ -30,8 +30,14 @@ pub const MIN_QTR_PWM: u16 = 3968u16;
 pub const MAX_QTR_PWM: u16 = 8000u16;
 
 /// ### Purpose:
+/// When connected via USB, the Maestro creates two virtual serial ports
+/// /dev/ttyACM0 for commands and /dev/ttyACM1 for communications.
+pub const VIRTUAL_COMMAND_PORT: &str = "/dev/ttyACM0";
+
+/// ### Purpose:
 /// Maximum number of channels on the Maestro.
 const CHANNEL_COUNT: u8 = 6u8;
+
 
 /// ### Purpose:
 /// All available channels to send commands to.
