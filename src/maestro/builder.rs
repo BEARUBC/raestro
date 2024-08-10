@@ -49,10 +49,10 @@ pub struct Builder {
     /// ### Purpose:
     /// Indicates whether the Maestro is connected using USB.
     pub using_usb_serial: bool,
+
+    
 }
 
-// TODO: @krarpit typestate for builder to provide a method to configure virtual serial 
-//                port to connect to
 impl Builder {
     /// ### Purpose:
     /// Convenience function to configure the baudrate for this builder.
